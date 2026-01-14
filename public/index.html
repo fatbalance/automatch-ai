@@ -8,169 +8,175 @@
   <style>
     :root {
       --bg: #0b1020;
-      --panel: #111827;
-      --card: #020617;
+      --card: #111827;
+      --border: #1f2937;
       --text: #e5e7eb;
       --muted: #9ca3af;
-      --accent: #4f46e5;
+      --accent: #3b82f6;
     }
 
     * {
       box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #111827, var(--bg));
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: radial-gradient(circle at top, #111827, #020617);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
     }
 
     .app {
       width: 100%;
-      max-width: 520px;
-      background: var(--panel);
-      border-radius: 20px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-      padding: 24px;
-      animation: fadeUp 0.6s ease;
+      max-width: 720px;
+      animation: fadeIn 0.6s ease;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
-      margin: 0 0 6px;
-      font-size: 1.6rem;
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
     }
 
     p.subtitle {
-      margin: 0 0 20px;
       color: var(--muted);
-      font-size: 0.95rem;
+      margin-bottom: 2rem;
     }
 
-    .field {
-      margin-bottom: 14px;
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
       color: var(--muted);
-      margin-bottom: 6px;
     }
 
     input, select {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: none;
-      background: var(--card);
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #020617;
       color: var(--text);
-      font-size: 0.95rem;
-      outline: none;
+      font-size: 1rem;
+      margin-bottom: 1rem;
     }
 
-    input::placeholder {
-      color: #6b7280;
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
     }
 
     button {
-      margin-top: 10px;
       width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent), #6366f1);
-      color: white;
+      padding: 0.9rem;
       font-size: 1rem;
-      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent);
+      color: white;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 10px 30px rgba(79,70,229,0.4);
+      transition: transform 0.1s ease, opacity 0.1s ease;
     }
 
     button:hover {
+      opacity: 0.9;
       transform: translateY(-1px);
-      box-shadow: 0 14px 40px rgba(79,70,229,0.6);
     }
 
-    .output {
-      margin-top: 20px;
-      padding: 14px;
+    .response {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
       border-radius: 14px;
-      background: var(--card);
-      font-size: 0.95rem;
+      background: #020617;
+      border: 1px solid var(--border);
       color: var(--muted);
       min-height: 60px;
-      animation: fadeUp 0.4s ease;
+      animation: fadeIn 0.4s ease;
     }
 
-    .typing {
-      display: inline-block;
-      animation: blink 1.4s infinite both;
-    }
-
-    @keyframes blink {
-      0% { opacity: 0.2; }
-      20% { opacity: 1; }
-      100% { opacity: 0.2; }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
     }
   </style>
 </head>
-
 <body>
   <div class="app">
     <h1>🚗 AutoMatch AI</h1>
-    <p class="subtitle">Tell us your budget and lifestyle. We’ll find the right car.</p>
+    <p class="subtitle">Tell us what you need — we’ll find the best car for you.</p>
 
-    <div class="field">
+    <div class="card">
       <label>Budget (£)</label>
-      <input id="budget" placeholder="e.g. 8000" />
-    </div>
+      <input id="budget" type="number" placeholder="e.g. 8000" />
 
-    <div class="field">
       <label>Car type</label>
       <select id="type">
-        <option>Any</option>
+        <option value="">Select one</option>
         <option>Hatchback</option>
-        <option>Sedan</option>
+        <option>Saloon</option>
         <option>SUV</option>
+        <option>Coupe</option>
         <option>Electric</option>
       </select>
+
+      <label>Primary use</label>
+      <select id="use">
+        <option value="">Select one</option>
+        <option>Daily commute</option>
+        <option>City driving</option>
+        <option>Long motorway trips</option>
+        <option>First car</option>
+        <option>Performance / fun</option>
+      </select>
+
+      <button onclick="findCar()">Find my car</button>
     </div>
 
-    <div class="field">
-      <label>Usage</label>
-      <input id="usage" placeholder="commuting, family, city driving…" />
+    <div id="response" class="response">
+      👋 Fill in your preferences and hit “Find my car”.
     </div>
 
-    <button onclick="fakeSearch()">Find my car</button>
-
-    <div id="output" class="output">
-      Waiting for your input…
+    <div class="footer">
+      AutoMatch AI · UK focused · Powered by AI
     </div>
   </div>
 
   <script>
-    function fakeSearch() {
-      const out = document.getElementById("output");
-      out.innerHTML = "Thinking<span class='typing'>...</span>";
+    function findCar() {
+      const budget = document.getElementById("budget").value;
+      const type = document.getElementById("type").value;
+      const use = document.getElementById("use").value;
 
-      setTimeout(() => {
-        out.innerHTML =
-          "This is where AI recommendations will appear. " +
-          "Next step: connect real AI + real prices.";
-      }, 1200);
+      const response = document.getElementById("response");
+
+      if (!budget || !type || !use) {
+        response.textContent = "⚠️ Please fill in all fields so I can help properly.";
+        return;
+      }
+
+      response.textContent =
+        `🤖 Thinking...\n\nBudget: £${budget}\nType: ${type}\nUse: ${use}\n\n(Next step: real AI response)`;
     }
   </script>
 </body>
 </html>
+
 
