@@ -6,52 +6,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
+  :root {
+    --bg: #0b1020;
+    --card: #111827;
+    --border: #1f2937;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+  }
+
+  * { box-sizing: border-box; }
+
   body {
     margin: 0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f9fafb;
-    color: #111827;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
   }
 
   .container {
     max-width: 720px;
     margin: auto;
     padding: 2rem 1.5rem;
-    animation: fadeIn 0.4s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.8rem;
     margin-bottom: 0.25rem;
   }
 
   p {
-    color: #6b7280;
+    color: var(--muted);
     margin-bottom: 2rem;
   }
 
+  .step {
+    display: none;
+    animation: slideIn 0.4s ease forwards;
+  }
+
+  .step.active {
+    display: block;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
   .card {
-    border: 1px solid #e5e7eb;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 1.25rem;
     margin-bottom: 1rem;
     cursor: pointer;
-    transition: border 0.15s ease, box-shadow 0.15s ease;
-    background: white;
+    transition: border 0.15s ease, transform 0.15s ease;
   }
 
   .card:hover {
-    border-color: #111827;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    border-color: #e5e7eb;
+    transform: translateY(-2px);
   }
 
-  .hidden {
-    display: none;
+  .card.selected {
+    border-color: #e5e7eb;
+    background: #020617;
   }
 
   input {
@@ -59,7 +79,9 @@
     padding: 0.9rem;
     font-size: 1rem;
     border-radius: 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border);
+    background: #020617;
+    color: var(--text);
   }
 
   button {
@@ -67,91 +89,106 @@
     padding: 1rem;
     border-radius: 14px;
     border: none;
-    background: #111827;
-    color: white;
+    background: #e5e7eb;
+    color: #020617;
     font-size: 1rem;
     cursor: pointer;
+    margin-top: 1rem;
   }
 </style>
 </head>
 
 <body>
 <div class="container">
-
-  <h1>Find your next car</h1>
+  <h1>AutoMatch AI</h1>
   <p>Answer a few quick questions.</p>
 
   <!-- STEP 1 -->
-  <div id="step1">
-    <h3>Your budget</h3>
+  <div id="step1" class="step active">
+    <h3>Your budget (£)</h3>
     <input id="budget" type="number" placeholder="e.g. 12000" />
-    <br><br>
-    <button onclick="nextStep(2)">Continue</button>
+    <button onclick="goTo(2)">Continue</button>
   </div>
 
   <!-- STEP 2 -->
-  <div id="step2" class="hidden">
-    <h3>What type of car?</h3>
+  <div id="step2" class="step">
+    <h3>What type of car are you open to?</h3>
 
-    <div class="card" onclick="select('Hatchback')">Hatchback</div>
-    <div class="card" onclick="select('SUV')">SUV</div>
-    <div class="card" onclick="select('Saloon')">Saloon</div>
-    <div class="card" onclick="select('Electric')">Electric</div>
+    <div class="card" onclick="toggle(this,'Hatchback')">Hatchback</div>
+    <div class="card" onclick="toggle(this,'Saloon')">Saloon</div>
+    <div class="card" onclick="toggle(this,'SUV')">SUV</div>
+    <div class="card" onclick="toggle(this,'Estate')">Estate</div>
+    <div class="card" onclick="toggle(this,'Coupe')">Coupe</div>
+    <div class="card" onclick="toggle(this,'Electric')">Electric</div>
+    <div class="card" onclick="toggle(this,'Hybrid')">Hybrid</div>
+
+    <button onclick="goTo(3)">Continue</button>
   </div>
 
   <!-- STEP 3 -->
-  <div id="step3" class="hidden">
-    <h3>What matters most?</h3>
+  <div id="step3" class="step">
+    <h3>What will you mostly use it for?</h3>
 
-    <div class="card" onclick="select('Low running costs')">Low running costs</div>
-    <div class="card" onclick="select('Reliability')">Reliability</div>
-    <div class="card" onclick="select('Comfort')">Comfort</div>
-    <div class="card" onclick="select('Performance')">Performance</div>
+    <div class="card" onclick="toggle(this,'Daily commute')">Daily commute</div>
+    <div class="card" onclick="toggle(this,'City driving')">City driving</div>
+    <div class="card" onclick="toggle(this,'Long motorway trips')">Long motorway trips</div>
+    <div class="card" onclick="toggle(this,'Family use')">Family use</div>
+    <div class="card" onclick="toggle(this,'First car')">First car</div>
+    <div class="card" onclick="toggle(this,'Fun / performance')">Fun / performance</div>
+
+    <button onclick="goTo(4)">Continue</button>
+  </div>
+
+  <!-- STEP 4 -->
+  <div id="step4" class="step">
+    <h3>What matters most to you?</h3>
+
+    <div class="card" onclick="toggle(this,'Reliability')">Reliability</div>
+    <div class="card" onclick="toggle(this,'Low running costs')">Low running costs</div>
+    <div class="card" onclick="toggle(this,'Low insurance')">Low insurance</div>
+    <div class="card" onclick="toggle(this,'Comfort')">Comfort</div>
+    <div class="card" onclick="toggle(this,'Technology')">Technology</div>
+    <div class="card" onclick="toggle(this,'Performance')">Performance</div>
+
+    <button onclick="showResult()">See my match</button>
   </div>
 
   <!-- RESULT -->
-  <div id="result" class="hidden">
-    <h3>Your match</h3>
+  <div id="result" class="step">
+    <h3>Your preferences</h3>
     <p id="summary"></p>
   </div>
-
 </div>
 
 <script>
   const answers = [];
 
-  function nextStep(step) {
-    document.getElementById("step1").classList.add("hidden");
-    document.getElementById("step2").classList.add("hidden");
-    document.getElementById("step3").classList.add("hidden");
-
-    document.getElementById("step" + step).classList.remove("hidden");
+  function goTo(step) {
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    document.getElementById("step" + step).classList.add("active");
   }
 
-  function select(value) {
-    answers.push(value);
-
-    if (answers.length === 1) {
-      nextStep(3);
+  function toggle(el, value) {
+    el.classList.toggle("selected");
+    if (answers.includes(value)) {
+      answers.splice(answers.indexOf(value), 1);
     } else {
-      showResult();
+      answers.push(value);
     }
   }
 
   function showResult() {
-    document.getElementById("step3").classList.add("hidden");
-    document.getElementById("result").classList.remove("hidden");
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    document.getElementById("result").classList.add("active");
 
-    const budget = document.getElementById("budget").value;
     document.getElementById("summary").textContent =
-      `Budget: £${budget}
-Car type: ${answers[0]}
-Priority: ${answers[1]}
+      `Budget: £${budget.value}
+Preferences:
+- ${answers.join("\n- ")}
 
-(Real AI recommendation next)`;
+(Real AI recommendations next)`;
   }
 </script>
-
 </body>
 </html>
 
