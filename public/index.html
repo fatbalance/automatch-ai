@@ -7,12 +7,11 @@
 
   <style>
     :root {
-      --bg: #0b1020;
-      --card: #111827;
+      --bg: #0f172a;
+      --card: #020617;
       --border: #1f2937;
       --text: #e5e7eb;
       --muted: #9ca3af;
-      --accent: #3b82f6;
     }
 
     * {
@@ -22,7 +21,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #111827, #020617);
+      background: var(--bg);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text);
       display: flex;
@@ -32,12 +31,12 @@
 
     .app {
       width: 100%;
-      max-width: 720px;
-      animation: fadeIn 0.6s ease;
+      max-width: 760px;
+      animation: fadeIn 0.4s ease;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -46,7 +45,7 @@
       margin-bottom: 0.25rem;
     }
 
-    p.subtitle {
+    .subtitle {
       color: var(--muted);
       margin-bottom: 2rem;
     }
@@ -55,18 +54,45 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
     }
 
-    label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 0.25rem;
-      color: var(--muted);
+    .section {
+      margin-bottom: 1.5rem;
     }
 
-    input, select {
+    .section h3 {
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .option {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s ease, border 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .option input {
+      accent-color: #e5e7eb;
+    }
+
+    .option:hover {
+      background: #020617;
+    }
+
+    input[type="number"] {
       width: 100%;
       padding: 0.75rem;
       border-radius: 10px;
@@ -74,24 +100,18 @@
       background: #020617;
       color: var(--text);
       font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
     }
 
     button {
       width: 100%;
       padding: 0.9rem;
-      font-size: 1rem;
-      border-radius: 12px;
+      border-radius: 14px;
       border: none;
-      background: var(--accent);
-      color: white;
+      background: #e5e7eb;
+      color: #020617;
+      font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.1s ease, opacity 0.1s ease;
+      transition: opacity 0.15s ease, transform 0.1s ease;
     }
 
     button:hover {
@@ -103,80 +123,76 @@
       margin-top: 1.5rem;
       padding: 1.25rem;
       border-radius: 14px;
-      background: #020617;
       border: 1px solid var(--border);
       color: var(--muted);
-      min-height: 60px;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--muted);
+      min-height: 70px;
+      animation: fadeIn 0.3s ease;
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>🚗 AutoMatch AI</h1>
-    <p class="subtitle">Tell us what you need — we’ll find the best car for you.</p>
+    <h1>AutoMatch AI</h1>
+    <p class="subtitle">Answer a few questions — we’ll handle the rest.</p>
 
     <div class="card">
-      <label>Budget (£)</label>
-      <input id="budget" type="number" placeholder="e.g. 8000" />
+      <div class="section">
+        <h3>Budget (£)</h3>
+        <input id="budget" type="number" placeholder="e.g. 10000" />
+      </div>
 
-      <label>Car type</label>
-      <select id="type">
-        <option value="">Select one</option>
-        <option>Hatchback</option>
-        <option>Saloon</option>
-        <option>SUV</option>
-        <option>Coupe</option>
-        <option>Electric</option>
-      </select>
+      <div class="section">
+        <h3>Car type</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Hatchback"> Hatchback</label>
+          <label class="option"><input type="checkbox" value="Saloon"> Saloon</label>
+          <label class="option"><input type="checkbox" value="SUV"> SUV</label>
+          <label class="option"><input type="checkbox" value="Estate"> Estate</label>
+          <label class="option"><input type="checkbox" value="Electric"> Electric</label>
+        </div>
+      </div>
 
-      <label>Primary use</label>
-      <select id="use">
-        <option value="">Select one</option>
-        <option>Daily commute</option>
-        <option>City driving</option>
-        <option>Long motorway trips</option>
-        <option>First car</option>
-        <option>Performance / fun</option>
-      </select>
+      <div class="section">
+        <h3>Primary use</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Daily commute"> Daily commute</label>
+          <label class="option"><input type="checkbox" value="City driving"> City driving</label>
+          <label class="option"><input type="checkbox" value="Long trips"> Long trips</label>
+          <label class="option"><input type="checkbox" value="First car"> First car</label>
+          <label class="option"><input type="checkbox" value="Fun / performance"> Fun / performance</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Priorities</h3>
+        <div class="options">
+          <label class="option"><input type="checkbox" value="Fuel efficiency"> Fuel efficiency</label>
+          <label class="option"><input type="checkbox" value="Reliability"> Reliability</label>
+          <label class="option"><input type="checkbox" value="Low insurance"> Low insurance</label>
+          <label class="option"><input type="checkbox" value="Technology"> Technology</label>
+          <label class="option"><input type="checkbox" value="Comfort"> Comfort</label>
+        </div>
+      </div>
 
       <button onclick="findCar()">Find my car</button>
     </div>
 
     <div id="response" class="response">
-      👋 Fill in your preferences and hit “Find my car”.
-    </div>
-
-    <div class="footer">
-      AutoMatch AI · UK focused · Powered by AI
+      Select what matters to you, then press “Find my car”.
     </div>
   </div>
 
   <script>
+    function getCheckedValues() {
+      return Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
+        .map(cb => cb.value);
+    }
+
     function findCar() {
       const budget = document.getElementById("budget").value;
-      const type = document.getElementById("type").value;
-      const use = document.getElementById("use").value;
-
+      const selections = getCheckedValues();
       const response = document.getElementById("response");
 
-      if (!budget || !type || !use) {
-        response.textContent = "⚠️ Please fill in all fields so I can help properly.";
-        return;
-      }
-
-      response.textContent =
-        `🤖 Thinking...\n\nBudget: £${budget}\nType: ${type}\nUse: ${use}\n\n(Next step: real AI response)`;
-    }
-  </script>
-</body>
-</html>
-
+      if (!budget || selections.length === 0) {
+        response.textContent = "Please enter a budget and se
 
