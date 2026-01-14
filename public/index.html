@@ -1,198 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AutoMatch AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>AutoMatch AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #020617;
-      --border: #1f2937;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f9fafb;
+    color: #111827;
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  .container {
+    max-width: 720px;
+    margin: auto;
+    padding: 2rem 1.5rem;
+    animation: fadeIn 0.4s ease;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      padding: 2rem;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .app {
-      width: 100%;
-      max-width: 760px;
-      animation: fadeIn 0.4s ease;
-    }
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+  }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  p {
+    color: #6b7280;
+    margin-bottom: 2rem;
+  }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.25rem;
-    }
+  .card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: border 0.15s ease, box-shadow 0.15s ease;
+    background: white;
+  }
 
-    .subtitle {
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
+  .card:hover {
+    border-color: #111827;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.75rem;
-      margin-bottom: 1.25rem;
-    }
+  .hidden {
+    display: none;
+  }
 
-    .section {
-      margin-bottom: 1.5rem;
-    }
+  input {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+  }
 
-    .section h3 {
-      font-size: 1rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 0.75rem;
-    }
-
-    .option {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0.75rem;
-      cursor: pointer;
-      transition: background 0.15s ease, border 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .option input {
-      accent-color: #e5e7eb;
-    }
-
-    .option:hover {
-      background: #020617;
-    }
-
-    input[type="number"] {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #020617;
-      color: var(--text);
-      font-size: 1rem;
-    }
-
-    button {
-      width: 100%;
-      padding: 0.9rem;
-      border-radius: 14px;
-      border: none;
-      background: #e5e7eb;
-      color: #020617;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: opacity 0.15s ease, transform 0.1s ease;
-    }
-
-    button:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    .response {
-      margin-top: 1.5rem;
-      padding: 1.25rem;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      min-height: 70px;
-      animation: fadeIn 0.3s ease;
-    }
-  </style>
+  button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 14px;
+    border: none;
+    background: #111827;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+</style>
 </head>
+
 <body>
-  <div class="app">
-    <h1>AutoMatch AI</h1>
-    <p class="subtitle">Answer a few questions — we’ll handle the rest.</p>
+<div class="container">
 
-    <div class="card">
-      <div class="section">
-        <h3>Budget (£)</h3>
-        <input id="budget" type="number" placeholder="e.g. 10000" />
-      </div>
+  <h1>Find your next car</h1>
+  <p>Answer a few quick questions.</p>
 
-      <div class="section">
-        <h3>Car type</h3>
-        <div class="options">
-          <label class="option"><input type="checkbox" value="Hatchback"> Hatchback</label>
-          <label class="option"><input type="checkbox" value="Saloon"> Saloon</label>
-          <label class="option"><input type="checkbox" value="SUV"> SUV</label>
-          <label class="option"><input type="checkbox" value="Estate"> Estate</label>
-          <label class="option"><input type="checkbox" value="Electric"> Electric</label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Primary use</h3>
-        <div class="options">
-          <label class="option"><input type="checkbox" value="Daily commute"> Daily commute</label>
-          <label class="option"><input type="checkbox" value="City driving"> City driving</label>
-          <label class="option"><input type="checkbox" value="Long trips"> Long trips</label>
-          <label class="option"><input type="checkbox" value="First car"> First car</label>
-          <label class="option"><input type="checkbox" value="Fun / performance"> Fun / performance</label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Priorities</h3>
-        <div class="options">
-          <label class="option"><input type="checkbox" value="Fuel efficiency"> Fuel efficiency</label>
-          <label class="option"><input type="checkbox" value="Reliability"> Reliability</label>
-          <label class="option"><input type="checkbox" value="Low insurance"> Low insurance</label>
-          <label class="option"><input type="checkbox" value="Technology"> Technology</label>
-          <label class="option"><input type="checkbox" value="Comfort"> Comfort</label>
-        </div>
-      </div>
-
-      <button onclick="findCar()">Find my car</button>
-    </div>
-
-    <div id="response" class="response">
-      Select what matters to you, then press “Find my car”.
-    </div>
+  <!-- STEP 1 -->
+  <div id="step1">
+    <h3>Your budget</h3>
+    <input id="budget" type="number" placeholder="e.g. 12000" />
+    <br><br>
+    <button onclick="nextStep(2)">Continue</button>
   </div>
 
-  <script>
-    function getCheckedValues() {
-      return Array.from(document.querySelectorAll("input[type='checkbox']:checked"))
-        .map(cb => cb.value);
+  <!-- STEP 2 -->
+  <div id="step2" class="hidden">
+    <h3>What type of car?</h3>
+
+    <div class="card" onclick="select('Hatchback')">Hatchback</div>
+    <div class="card" onclick="select('SUV')">SUV</div>
+    <div class="card" onclick="select('Saloon')">Saloon</div>
+    <div class="card" onclick="select('Electric')">Electric</div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" class="hidden">
+    <h3>What matters most?</h3>
+
+    <div class="card" onclick="select('Low running costs')">Low running costs</div>
+    <div class="card" onclick="select('Reliability')">Reliability</div>
+    <div class="card" onclick="select('Comfort')">Comfort</div>
+    <div class="card" onclick="select('Performance')">Performance</div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="hidden">
+    <h3>Your match</h3>
+    <p id="summary"></p>
+  </div>
+
+</div>
+
+<script>
+  const answers = [];
+
+  function nextStep(step) {
+    document.getElementById("step1").classList.add("hidden");
+    document.getElementById("step2").classList.add("hidden");
+    document.getElementById("step3").classList.add("hidden");
+
+    document.getElementById("step" + step).classList.remove("hidden");
+  }
+
+  function select(value) {
+    answers.push(value);
+
+    if (answers.length === 1) {
+      nextStep(3);
+    } else {
+      showResult();
     }
+  }
 
-    function findCar() {
-      const budget = document.getElementById("budget").value;
-      const selections = getCheckedValues();
-      const response = document.getElementById("response");
+  function showResult() {
+    document.getElementById("step3").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
 
-      if (!budget || selections.length === 0) {
-        response.textContent = "Please enter a budget and se
+    const budget = document.getElementById("budget").value;
+    document.getElementById("summary").textContent =
+      `Budget: £${budget}
+Car type: ${answers[0]}
+Priority: ${answers[1]}
+
+(Real AI recommendation next)`;
+  }
+</script>
+
+</body>
+</html>
 
