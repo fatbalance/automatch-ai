@@ -2,127 +2,212 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AutoMatch AI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoMatch AI</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #111827, #020617);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b0b0b;
+      color: #ffffff;
+    }
+
+    header {
+      padding: 28px 40px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 80px 30px 120px;
+    }
+
+    .hero {
+      margin-bottom: 70px;
+    }
+
+    .hero h2 {
+      font-size: 46px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #b3b3b3;
+      max-width: 700px;
+      line-height: 1.6;
     }
 
     .card {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 20px;
-      padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      animation: slideUp 0.6s ease;
+      background: #111111;
+      border: 1px solid #1f1f1f;
+      border-radius: 18px;
+      padding: 42px;
     }
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 8px;
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 32px;
     }
 
-    p {
-      opacity: 0.7;
-      margin-bottom: 24px;
-    }
-
-    .options {
+    .grid {
       display: grid;
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
     }
 
     label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #cfcfcf;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
       padding: 14px 16px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.05);
-      cursor: pointer;
-      transition: 0.2s;
-      border: 1px solid transparent;
+      border: 1px solid #2a2a2a;
+      background: #0b0b0b;
+      color: #ffffff;
+      font-size: 15px;
     }
 
-    input {
-      display: none;
+    textarea {
+      min-height: 90px;
+      resize: vertical;
     }
 
-    input:checked + label {
-      border-color: #38bdf8;
-      background: rgba(56,189,248,0.15);
+    .full {
+      grid-column: 1 / -1;
     }
 
-    button {
-      width: 100%;
-      margin-top: 24px;
-      padding: 16px;
+    .cta {
+      margin-top: 44px;
+    }
+
+    .cta button {
+      padding: 16px 36px;
       border-radius: 14px;
       border: none;
-      background: #38bdf8;
-      color: #020617;
+      background: #ffffff;
+      color: #0b0b0b;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      background: #7dd3fc;
+    footer {
+      padding: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: #777777;
+      border-top: 1px solid #1e1e1e;
     }
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
+    @media (max-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+
+      .hero h2 {
+        font-size: 34px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>🚗 AutoMatch AI</h1>
-    <p>What matters most to you?</p>
 
-    <div class="options">
-      <input type="checkbox" id="cheap">
-      <label for="cheap">Affordable / low running cost</label>
+<header>
+  <h1>AutoMatch AI</h1>
+</header>
 
-      <input type="checkbox" id="reliable">
-      <label for="reliable">Reliable & low maintenance</label>
+<main>
 
-      <input type="checkbox" id="fast">
-      <label for="fast">Fast / fun to drive</label>
+  <section class="hero">
+    <h2>Find the right car for your life.</h2>
+    <p>
+      Tell us what matters to you — budget, lifestyle, and priorities.
+      We’ll match you with cars that actually make sense.
+    </p>
+  </section>
 
-      <input type="checkbox" id="luxury">
-      <label for="luxury">Luxury / premium feel</label>
+  <section class="card">
+    <h3>Your preferences</h3>
+
+    <div class="grid">
+      <div>
+        <label>Maximum budget</label>
+        <input placeholder="e.g. £12,000 or £350 / month" />
+      </div>
+
+      <div>
+        <label>Car type</label>
+        <select>
+          <option>No preference</option>
+          <option>Hatchback</option>
+          <option>SUV</option>
+          <option>Saloon</option>
+          <option>Estate</option>
+          <option>Electric</option>
+          <option>Hybrid</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Main use</label>
+        <select>
+          <option>Daily commuting</option>
+          <option>City driving</option>
+          <option>Long motorway trips</option>
+          <option>Family use</option>
+          <option>First car</option>
+        </select>
+      </div>
+
+      <div>
+        <label>What matters most</label>
+        <select>
+          <option>Reliability</option>
+          <option>Low running costs</option>
+          <option>Comfort</option>
+          <option>Technology</option>
+          <option>Performance</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <label>Anything else we should consider?</label>
+        <textarea placeholder="Brands you like or dislike, insurance concerns, reliability worries, etc."></textarea>
+      </div>
     </div>
 
-    <button onclick="nextStep()">Continue</button>
-  </div>
+    <div class="cta">
+      <button>Match me with a car</button>
+    </div>
+  </section>
 
-  <script>
-    function nextStep() {
-      alert("Next step: budget, body type, and real AI 👀");
-    }
-  </script>
+</main>
+
+<footer>
+  AutoMatch AI · Prototype
+</footer>
+
 </body>
 </html>
 
