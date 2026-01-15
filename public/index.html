@@ -37,7 +37,7 @@
     }
 
     .hero h2 {
-      font-size: 46px;
+      font-size: 48px;
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 16px;
@@ -46,37 +46,36 @@
     .hero p {
       font-size: 18px;
       color: #b3b3b3;
-      max-width: 700px;
+      max-width: 720px;
       line-height: 1.6;
     }
 
     .card {
       background: #111111;
       border: 1px solid #1f1f1f;
-      border-radius: 18px;
-      padding: 42px;
+      border-radius: 20px;
+      padding: 46px;
     }
 
     .card h3 {
       font-size: 22px;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
+      gap: 28px;
     }
 
     label {
       display: block;
       font-size: 14px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: #cfcfcf;
     }
 
     input,
-    select,
     textarea {
       width: 100%;
       padding: 14px 16px;
@@ -92,17 +91,40 @@
       resize: vertical;
     }
 
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .options label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid #2a2a2a;
+      background: #0b0b0b;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .options input {
+      accent-color: white;
+    }
+
     .full {
       grid-column: 1 / -1;
     }
 
     .cta {
-      margin-top: 44px;
+      margin-top: 48px;
+      text-align: center;
     }
 
     .cta button {
-      padding: 16px 36px;
-      border-radius: 14px;
+      padding: 16px 42px;
+      border-radius: 16px;
       border: none;
       background: #ffffff;
       color: #0b0b0b;
@@ -112,7 +134,7 @@
     }
 
     footer {
-      padding: 20px;
+      padding: 22px;
       text-align: center;
       font-size: 13px;
       color: #777777;
@@ -125,7 +147,7 @@
       }
 
       .hero h2 {
-        font-size: 34px;
+        font-size: 36px;
       }
     }
   </style>
@@ -142,8 +164,8 @@
   <section class="hero">
     <h2>Find the right car for your life.</h2>
     <p>
-      Tell us what matters to you — budget, lifestyle, and priorities.
-      We’ll match you with cars that actually make sense.
+      Choose everything that applies to you. There’s no wrong answer —
+      the more you select, the better the match.
     </p>
   </section>
 
@@ -157,38 +179,37 @@
       </div>
 
       <div>
-        <label>Car type</label>
-        <select>
-          <option>No preference</option>
-          <option>Hatchback</option>
-          <option>SUV</option>
-          <option>Saloon</option>
-          <option>Estate</option>
-          <option>Electric</option>
-          <option>Hybrid</option>
-        </select>
+        <label>Car type (select all that apply)</label>
+        <div class="options">
+          <label><input type="checkbox"> Hatchback</label>
+          <label><input type="checkbox"> SUV</label>
+          <label><input type="checkbox"> Saloon</label>
+          <label><input type="checkbox"> Estate</label>
+          <label><input type="checkbox"> Electric</label>
+          <label><input type="checkbox"> Hybrid</label>
+        </div>
       </div>
 
       <div>
         <label>Main use</label>
-        <select>
-          <option>Daily commuting</option>
-          <option>City driving</option>
-          <option>Long motorway trips</option>
-          <option>Family use</option>
-          <option>First car</option>
-        </select>
+        <div class="options">
+          <label><input type="checkbox"> Daily commuting</label>
+          <label><input type="checkbox"> City driving</label>
+          <label><input type="checkbox"> Long motorway trips</label>
+          <label><input type="checkbox"> Family use</label>
+          <label><input type="checkbox"> First car</label>
+        </div>
       </div>
 
       <div>
         <label>What matters most</label>
-        <select>
-          <option>Reliability</option>
-          <option>Low running costs</option>
-          <option>Comfort</option>
-          <option>Technology</option>
-          <option>Performance</option>
-        </select>
+        <div class="options">
+          <label><input type="checkbox"> Reliability</label>
+          <label><input type="checkbox"> Low running costs</label>
+          <label><input type="checkbox"> Comfort</label>
+          <label><input type="checkbox"> Technology</label>
+          <label><input type="checkbox"> Performance</label>
+        </div>
       </div>
 
       <div class="full">
