@@ -7,227 +7,394 @@
 
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: #0b0b0b;
-      color: #ffffff;
+      color: #fff;
     }
 
-    header {
-      padding: 28px 40px;
+    header{
+      padding: 26px 40px;
       border-bottom: 1px solid #1e1e1e;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
     }
-
-    header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 0;
+    header .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:600; letter-spacing:.2px;
     }
+    header .brand .dot{
+      width:10px; height:10px; border-radius:999px; background:#fff; opacity:.9;
+    }
+    header .hint{ color:#8a8a8a; font-size:14px; }
 
-    main {
-      max-width: 1000px;
+    main{
+      max-width: 1040px;
       margin: 0 auto;
-      padding: 80px 30px 120px;
+      padding: 64px 30px 120px;
     }
 
-    .hero {
-      margin-bottom: 70px;
+    .hero{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:24px;
+      margin-bottom: 26px;
     }
-
-    .hero h2 {
-      font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
+    .hero h1{
+      margin:0;
+      font-size: 52px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
-
-    .hero p {
-      font-size: 18px;
-      color: #b3b3b3;
-      max-width: 720px;
+    .hero p{
+      margin:0;
+      max-width: 520px;
+      color:#b3b3b3;
+      font-size: 16px;
       line-height: 1.6;
     }
 
-    .card {
-      background: #111111;
+    .layout{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 18px;
+      margin-top: 26px;
+    }
+
+    .panel{
+      background: #101010;
       border: 1px solid #1f1f1f;
       border-radius: 20px;
-      padding: 46px;
+      padding: 22px;
     }
 
-    .card h3 {
-      font-size: 22px;
-      margin-bottom: 36px;
+    .panel h2{
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 28px;
-    }
-
-    label {
-      display: block;
+    .panel .sub{
+      margin: 0 0 16px;
+      color:#9a9a9a;
       font-size: 14px;
-      margin-bottom: 10px;
-      color: #cfcfcf;
+      line-height: 1.5;
     }
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
+    .q{
+      padding: 16px 0;
+      border-top: 1px solid #1e1e1e;
+    }
+    .q:first-of-type{ border-top: 0; padding-top: 6px; }
+    .q .qtitle{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .q .qtitle b{
+      font-size: 14px;
+      color:#e6e6e6;
+      font-weight: 600;
+    }
+    .q .qtitle span{
+      font-size: 12px;
+      color:#8a8a8a;
+    }
+
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap: wrap;
+    }
+
+    /* Pill chips (multi-select) */
+    .chip {
       border: 1px solid #2a2a2a;
       background: #0b0b0b;
-      color: #ffffff;
-      font-size: 15px;
+      color: #e7e7e7;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease, opacity .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .chip:hover { transform: translateY(-1px); border-color:#3a3a3a; }
+    .chip:active{ transform: translateY(0px); opacity:.92; }
+
+    .chip .tick{
+      width: 16px;
+      height: 16px;
+      border-radius: 6px;
+      border: 1px solid #3a3a3a;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      color:#0b0b0b;
+      background: transparent;
+      transition: background .12s ease, border-color .12s ease, color .12s ease;
     }
 
-    textarea {
-      min-height: 90px;
-      resize: vertical;
+    input[type="checkbox"]{ display:none; }
+    input[type="checkbox"]:checked + label.chip{
+      border-color: #e5e7eb;
+      background: rgba(255,255,255,0.06);
+    }
+    input[type="checkbox"]:checked + label.chip .tick{
+      background:#e5e7eb;
+      border-color:#e5e7eb;
+      color:#0b0b0b;
     }
 
-    .options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+    /* Budget field */
+    .money{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
     }
-
-    .options label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
+    .money input{
+      width: 220px;
+      padding: 12px 14px;
       border-radius: 14px;
       border: 1px solid #2a2a2a;
       background: #0b0b0b;
-      cursor: pointer;
-      font-size: 14px;
+      color: #fff;
+      font-size: 15px;
+    }
+    .money small{
+      color:#8a8a8a;
+      font-size: 12px;
     }
 
-    .options input {
-      accent-color: white;
-    }
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
-    .cta {
-      margin-top: 48px;
-      text-align: center;
-    }
-
-    .cta button {
-      padding: 16px 42px;
+    textarea{
+      width:100%;
+      padding: 14px 14px;
       border-radius: 16px;
-      border: none;
-      background: #ffffff;
-      color: #0b0b0b;
-      font-size: 16px;
+      border: 1px solid #2a2a2a;
+      background: #0b0b0b;
+      color: #fff;
+      font-size: 14px;
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .actions{
+      margin-top: 18px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content: space-between;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid #2a2a2a;
+      background: #0b0b0b;
+      color: #fff;
       font-weight: 600;
-      cursor: pointer;
+      cursor:pointer;
+      transition: transform .12s ease, opacity .12s ease, border-color .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color:#3a3a3a; }
+    .btn:active{ transform: translateY(0px); opacity:.92; }
+
+    .btn.primary{
+      background:#fff;
+      color:#0b0b0b;
+      border-color:#fff;
     }
 
-    footer {
-      padding: 22px;
-      text-align: center;
+    /* Right side summary */
+    .summary{
+      position: sticky;
+      top: 18px;
+      height: fit-content;
+    }
+    .summary .box{
+      background:#0e0e0e;
+      border: 1px solid #1f1f1f;
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .summary h3{
+      margin:0 0 8px;
+      font-size: 14px;
+      color:#d6d6d6;
+      font-weight: 650;
+    }
+    .summary .meta{
+      color:#8a8a8a;
+      font-size: 12px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .summary pre{
+      margin:0;
+      white-space: pre-wrap;
+      color:#bdbdbd;
       font-size: 13px;
-      color: #777777;
-      border-top: 1px solid #1e1e1e;
+      line-height: 1.5;
+      background: transparent;
     }
 
-    @media (max-width: 720px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero h2 {
-        font-size: 36px;
-      }
+    @media (max-width: 900px){
+      .layout{ grid-template-columns: 1fr; }
+      .summary{ position: static; }
+      .hero{ flex-direction: column; align-items:flex-start; }
+      .hero h1{ font-size: 42px; }
     }
   </style>
 </head>
 
 <body>
-
 <header>
-  <h1>AutoMatch AI</h1>
+  <div class="brand"><span class="dot"></span> AutoMatch AI</div>
+  <div class="hint">UK focused · multiple choice · fast</div>
 </header>
 
 <main>
-
   <section class="hero">
-    <h2>Find the right car for your life.</h2>
+    <div>
+      <h1>Find the right car<br/>for your life.</h1>
+    </div>
     <p>
-      Choose everything that applies to you. There’s no wrong answer —
-      the more you select, the better the match.
+      Pick what applies — the more you select, the better the match.
+      We’ll turn this into real AI recommendations next.
     </p>
   </section>
 
-  <section class="card">
-    <h3>Your preferences</h3>
+  <section class="layout">
+    <!-- Left: questions -->
+    <div class="panel">
+      <h2>Your preferences</h2>
+      <p class="sub">Multi-select on everything. Keep it broad — we’ll narrow it down later.</p>
 
-    <div class="grid">
-      <div>
-        <label>Maximum budget</label>
-        <input placeholder="e.g. £12,000 or £350 / month" />
-      </div>
-
-      <div>
-        <label>Car type (select all that apply)</label>
-        <div class="options">
-          <label><input type="checkbox"> Hatchback</label>
-          <label><input type="checkbox"> SUV</label>
-          <label><input type="checkbox"> Saloon</label>
-          <label><input type="checkbox"> Estate</label>
-          <label><input type="checkbox"> Electric</label>
-          <label><input type="checkbox"> Hybrid</label>
+      <div class="q">
+        <div class="qtitle"><b>Budget</b><span>optional format: cash or monthly</span></div>
+        <div class="money">
+          <input id="budget" placeholder="£12,000 or £350 / mo" />
+          <small>Tip: don’t overthink it</small>
         </div>
       </div>
 
-      <div>
-        <label>Main use</label>
-        <div class="options">
-          <label><input type="checkbox"> Daily commuting</label>
-          <label><input type="checkbox"> City driving</label>
-          <label><input type="checkbox"> Long motorway trips</label>
-          <label><input type="checkbox"> Family use</label>
-          <label><input type="checkbox"> First car</label>
+      <div class="q">
+        <div class="qtitle"><b>Car type</b><span>select all that apply</span></div>
+        <div class="row">
+          <input id="t_hatch" type="checkbox" value="Hatchback"><label class="chip" for="t_hatch"><span class="tick">✓</span>Hatchback</label>
+          <input id="t_suv" type="checkbox" value="SUV"><label class="chip" for="t_suv"><span class="tick">✓</span>SUV</label>
+          <input id="t_saloon" type="checkbox" value="Saloon"><label class="chip" for="t_saloon"><span class="tick">✓</span>Saloon</label>
+          <input id="t_estate" type="checkbox" value="Estate"><label class="chip" for="t_estate"><span class="tick">✓</span>Estate</label>
+          <input id="t_coupe" type="checkbox" value="Coupe"><label class="chip" for="t_coupe"><span class="tick">✓</span>Coupe</label>
+          <input id="t_electric" type="checkbox" value="Electric"><label class="chip" for="t_electric"><span class="tick">✓</span>Electric</label>
+          <input id="t_hybrid" type="checkbox" value="Hybrid"><label class="chip" for="t_hybrid"><span class="tick">✓</span>Hybrid</label>
         </div>
       </div>
 
-      <div>
-        <label>What matters most</label>
-        <div class="options">
-          <label><input type="checkbox"> Reliability</label>
-          <label><input type="checkbox"> Low running costs</label>
-          <label><input type="checkbox"> Comfort</label>
-          <label><input type="checkbox"> Technology</label>
-          <label><input type="checkbox"> Performance</label>
+      <div class="q">
+        <div class="qtitle"><b>Main use</b><span>select all that apply</span></div>
+        <div class="row">
+          <input id="u_commute" type="checkbox" value="Daily commuting"><label class="chip" for="u_commute"><span class="tick">✓</span>Daily commuting</label>
+          <input id="u_city" type="checkbox" value="City driving"><label class="chip" for="u_city"><span class="tick">✓</span>City driving</label>
+          <input id="u_motorway" type="checkbox" value="Long motorway trips"><label class="chip" for="u_motorway"><span class="tick">✓</span>Long motorway trips</label>
+          <input id="u_family" type="checkbox" value="Family use"><label class="chip" for="u_family"><span class="tick">✓</span>Family use</label>
+          <input id="u_first" type="checkbox" value="First car"><label class="chip" for="u_first"><span class="tick">✓</span>First car</label>
+          <input id="u_fun" type="checkbox" value="Fun / performance"><label class="chip" for="u_fun"><span class="tick">✓</span>Fun / performance</label>
         </div>
       </div>
 
-      <div class="full">
-        <label>Anything else we should consider?</label>
-        <textarea placeholder="Brands you like or dislike, insurance concerns, reliability worries, etc."></textarea>
+      <div class="q">
+        <div class="qtitle"><b>Priorities</b><span>select all that apply</span></div>
+        <div class="row">
+          <input id="p_reliable" type="checkbox" value="Reliability"><label class="chip" for="p_reliable"><span class="tick">✓</span>Reliability</label>
+          <input id="p_costs" type="checkbox" value="Low running costs"><label class="chip" for="p_costs"><span class="tick">✓</span>Low running costs</label>
+          <input id="p_ins" type="checkbox" value="Low insurance"><label class="chip" for="p_ins"><span class="tick">✓</span>Low insurance</label>
+          <input id="p_comfort" type="checkbox" value="Comfort"><label class="chip" for="p_comfort"><span class="tick">✓</span>Comfort</label>
+          <input id="p_tech" type="checkbox" value="Technology"><label class="chip" for="p_tech"><span class="tick">✓</span>Technology</label>
+          <input id="p_perf" type="checkbox" value="Performance"><label class="chip" for="p_perf"><span class="tick">✓</span>Performance</label>
+          <input id="p_space" type="checkbox" value="Boot space"><label class="chip" for="p_space"><span class="tick">✓</span>Boot space</label>
+          <input id="p_ulez" type="checkbox" value="ULEZ friendly"><label class="chip" for="p_ulez"><span class="tick">✓</span>ULEZ friendly</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="qtitle"><b>Anything else</b><span>optional</span></div>
+        <textarea id="notes" placeholder="Brands you like/dislike, insurance concerns, must-have features…"></textarea>
+
+        <div class="actions">
+          <button class="btn" type="button" onclick="resetAll()">Reset</button>
+          <button class="btn primary" type="button" onclick="preview()">Preview picks</button>
+        </div>
       </div>
     </div>
 
-    <div class="cta">
-      <button>Match me with a car</button>
-    </div>
+    <!-- Right: live summary -->
+    <aside class="summary">
+      <div class="box">
+        <h3>Live summary</h3>
+        <div class="meta">This updates as you click. Next step will send this to AI.</div>
+        <pre id="out">Select a few chips to start…</pre>
+      </div>
+    </aside>
   </section>
-
 </main>
 
-<footer>
-  AutoMatch AI · Prototype
-</footer>
+<script>
+  const out = document.getElementById("out");
+  const budget = document.getElementById("budget");
+  const notes = document.getElementById("notes");
+  const allChecks = () => Array.from(document.querySelectorAll('input[type="checkbox"]'));
+  const selected = () => allChecks().filter(c => c.checked).map(c => c.value);
+
+  function render() {
+    const picks = selected();
+    const b = budget.value?.trim();
+    const n = notes.value?.trim();
+
+    out.textContent =
+`Budget: ${b || "—"}
+Selected (${picks.length}):
+${picks.length ? "- " + picks.join("\n- ") : "—"}
+
+Notes: ${n || "—"}`;
+  }
+
+  function preview() {
+    render();
+    // little nudge feel without changing colours
+    out.parentElement.animate(
+      [{ transform: "translateY(0px)" }, { transform: "translateY(-2px)" }, { transform: "translateY(0px)" }],
+      { duration: 220, easing: "ease-out" }
+    );
+  }
+
+  function resetAll() {
+    budget.value = "";
+    notes.value = "";
+    allChecks().forEach(c => c.checked = false);
+    render();
+  }
+
+  // Live updates
+  document.addEventListener("change", (e) => {
+    if (e.target.matches('input[type="checkbox"]')) render();
+  });
+  budget.addEventListener("input", render);
+  notes.addEventListener("input", render);
+
+  render();
+</script>
 
 </body>
 </html>
