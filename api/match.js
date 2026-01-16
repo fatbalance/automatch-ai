@@ -1,59 +1,87 @@
 export default async function handler(req, res) {
+  // Only allow POST
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
   try {
-    const { budget, picks, notes } = req.body || {};
-    const safeBudget = (budget ?? "").toString().trim();
-    const safePicks = Array.isArray(picks) ? picks : [];
-    const safeNotes = (notes ?? "").toString().trim();
+    // Read body safely
+    const body = req.body || {};
+    const budget = (body.budget ?? "").toString().trim();
+    const picks = Array.isArray(body.picks) ? body.picks.map(String) : [];
+    const notes = (body.notes ?? "").toString().trim();
 
+    // Ensure API key exists (set in Vercel env vars)
     if (!process.env.GROQ_API_KEY) {
-      return res.status(500).json({ error: "Missing GROQ_API_KEY in environment variables" });
+      return res.status(500).json({
+        error: "Missing GROQ_API_KEY",
+        hint: "Set GROQ_API_KEY in Vercel → Settings → Environment Variables (Production), then redeploy.",
+      });
     }
 
-    const prompt = [
-      `Budget: ${safeBudget || "Not provided"}`,
-      `Preferences: ${safePicks.length ? safePicks.join(", ") : "None selected"}`,
-      `Notes: ${safeNotes || "None"}`,
+    // You can swap this model if you want:
+    // - "llama-3.3-70b-versatile" (strong, good reasoning)
+    // - "llama-3.1-8b-instant" (faster/cheaper)
+    const MODEL = "llama-3.3-70b-versatile";
+
+    const userPrompt = [
+      `Budget: ${budget || "Not provided"}`,
+      `Preferences: ${picks.length ? picks.join(", ") : "None selected"}`,
+      `Notes: ${notes || "None"}`,
       "",
       "Task:",
-      "- Recommend 3 cars available in the UK market that match the user.",
-      "- For each car: give a 1-line reason + 3 bullet pros/cons (short).",
-      "- Ask 1 follow-up question to improve the match.",
+      "Recommend 3 cars that suit the user in the UK market.",
+      "For each: give a 1-line reason + 3 short bullets (pros/cons or key points).",
+      "Then ask 1 short follow-up question to improve the match.",
+      "Keep it concise and practical.",
     ].join("\n");
 
-    const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-model: "llama-3.3-70b-versatile",
-         temperature: 0.7,
+        model: MODEL,
+        temperature: 0.7,
         messages: [
-          { role: "system", content: "You are a practical UK car advisor. Be concise and specific." },
-          { role: "user", content: prompt },
+          {
+            role: "system",
+            content: "You are a practical UK car advisor. Be concise, specific, and not salesy.",
+          },
+          { role: "user", content: userPrompt },
         ],
       }),
     });
 
-    const data = await r.json();
+    const data = await response.json();
 
-    if (!r.ok) {
-      return res.status(r.status).json({
+    // If Groq returns an error, return it clearly (without leaking secrets)
+    if (!response.ok) {
+      return res.status(response.status).json({
         error: "Groq request failed",
+        status: response.status,
+        details: data,
+        hint: "If the error mentions a model, change MODEL to a supported one (e.g. llama-3.3-70b-versatile or llama-3.1-8b-instant).",
+      });
+    }
+
+    const reply = data?.choices?.[0]?.message?.content;
+
+    if (!reply) {
+      return res.status(500).json({
+        error: "No reply returned from model",
         details: data,
       });
     }
 
-    const reply = data?.choices?.[0]?.message?.content ?? "No response from model.";
-
     return res.status(200).json({ reply });
   } catch (err) {
-    return res.status(500).json({ error: "Server error", details: err?.message || String(err) });
+    return res.status(500).json({
+      error: "Server error",
+      details: err?.message || String(err),
+    });
   }
 }
 
