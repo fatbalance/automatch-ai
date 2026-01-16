@@ -31,8 +31,8 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llama3-70b-8192",
-        temperature: 0.7,
+model: "llama-3.3-70b-versatile",
+         temperature: 0.7,
         messages: [
           { role: "system", content: "You are a practical UK car advisor. Be concise and specific." },
           { role: "user", content: prompt },
