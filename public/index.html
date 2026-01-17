@@ -22,14 +22,14 @@
       justify-content:space-between;
       gap:16px;
     }
-    .brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:.2px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
     .dot{width:10px;height:10px;border-radius:999px;background:#fff;opacity:.9}
     .hint{color:#8a8a8a;font-size:14px}
 
     main{
-      max-width:1040px;
+      max-width:1100px;
       margin:0 auto;
-      padding:64px 30px 120px;
+      padding:72px 30px 140px;
     }
 
     .hero{
@@ -37,25 +37,25 @@
       align-items:flex-end;
       justify-content:space-between;
       gap:24px;
-      margin-bottom:26px;
+      margin-bottom:30px;
     }
     .hero h1{
       margin:0;
-      font-size:52px;
-      line-height:1.05;
-      letter-spacing:-.03em;
+      font-size:56px;
+      line-height:1.02;
+      letter-spacing:-.04em;
     }
     .hero p{
       margin:0;
-      max-width:520px;
+      max-width:560px;
       color:#b3b3b3;
       font-size:16px;
-      line-height:1.6;
+      line-height:1.65;
     }
 
     .layout{
       display:grid;
-      grid-template-columns:1.25fr .75fr;
+      grid-template-columns:1.35fr .65fr;
       gap:18px;
       margin-top:26px;
     }
@@ -63,16 +63,16 @@
     .panel{
       background:#101010;
       border:1px solid #1f1f1f;
-      border-radius:20px;
-      padding:22px;
+      border-radius:22px;
+      padding:24px;
     }
-    .panel h2{margin:0 0 10px;font-size:18px;font-weight:650;letter-spacing:-.01em}
-    .panel .sub{margin:0 0 16px;color:#9a9a9a;font-size:14px;line-height:1.5}
+    .panel h2{margin:0 0 10px;font-size:19px;font-weight:750;letter-spacing:-.01em}
+    .panel .sub{margin:0 0 18px;color:#9a9a9a;font-size:14px;line-height:1.55}
 
-    .q{padding:16px 0;border-top:1px solid #1e1e1e}
-    .q:first-of-type{border-top:0;padding-top:6px}
+    .q{padding:18px 0;border-top:1px solid #1e1e1e}
+    .q:first-of-type{border-top:0;padding-top:8px}
     .qtitle{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
-    .qtitle b{font-size:14px;color:#e6e6e6;font-weight:600}
+    .qtitle b{font-size:14px;color:#e6e6e6;font-weight:650}
     .qtitle span{font-size:12px;color:#8a8a8a}
 
     .row{display:flex;gap:12px;flex-wrap:wrap}
@@ -114,7 +114,8 @@
 
     .money{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .money input{
-      width:260px;
+      width:320px;
+      max-width:100%;
       padding:12px 14px;
       border-radius:14px;
       border:1px solid #2a2a2a;
@@ -132,7 +133,7 @@
       background:#0b0b0b;
       color:#fff;
       font-size:14px;
-      min-height:92px;
+      min-height:96px;
       resize:vertical;
     }
 
@@ -150,7 +151,7 @@
       border:1px solid #2a2a2a;
       background:#0b0b0b;
       color:#fff;
-      font-weight:650;
+      font-weight:700;
       cursor:pointer;
       transition:transform .12s ease,opacity .12s ease,border-color .12s ease;
       display:inline-flex;
@@ -162,16 +163,19 @@
     .btn.primary{background:#fff;color:#0b0b0b;border-color:#fff}
     .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
+    /* hide chat button until match success */
+    #chatBtn{display:none}
+
     .summary{position:sticky;top:18px;height:fit-content}
     .summary .box{
       background:#0e0e0e;
       border:1px solid #1f1f1f;
-      border-radius:20px;
+      border-radius:22px;
       padding:18px;
     }
-    .summary h3{margin:0 0 8px;font-size:14px;color:#d6d6d6;font-weight:650}
-    .summary .meta{color:#8a8a8a;font-size:12px;margin-bottom:12px;line-height:1.4}
-    .summary pre{margin:0;white-space:pre-wrap;color:#bdbdbd;font-size:13px;line-height:1.5}
+    .summary h3{margin:0 0 8px;font-size:14px;color:#d6d6d6;font-weight:750}
+    .summary .meta{color:#8a8a8a;font-size:12px;margin-bottom:12px;line-height:1.45}
+    .summary pre{margin:0;white-space:pre-wrap;color:#bdbdbd;font-size:13px;line-height:1.55}
 
     .results{margin-top:18px;display:none;animation:fadeIn .25s ease both}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -179,21 +183,15 @@
     .reply{
       border:1px solid #1f1f1f;
       background:#0e0e0e;
-      border-radius:20px;
-      padding:16px;
+      border-radius:22px;
+      padding:18px;
       color:#e6e6e6;
-      line-height:1.65;
+      line-height:1.7;
       font-size:14px;
       overflow-wrap:anywhere;
     }
-    .reply pre{
-      margin:0;
-      white-space:pre-wrap;
-      font:inherit;
-      color:inherit;
-      line-height:1.65;
-    }
-    .reply .h{margin:10px 0 6px;font-weight:750;color:#f3f4f6}
+    .reply pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit;line-height:1.7}
+    .reply .h{margin:10px 0 6px;font-weight:800;color:#f3f4f6}
     .reply ul{margin:8px 0 12px 18px;padding:0}
     .reply li{margin:6px 0;color:#dedede}
 
@@ -221,8 +219,7 @@
 
     .caret{
       display:inline-block;
-      width:8px;
-      height:16px;
+      width:8px;height:16px;
       background:#e5e7eb;
       margin-left:6px;
       border-radius:2px;
@@ -232,10 +229,11 @@
     @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
     @media (max-width:900px){
+      main{padding:56px 18px 110px}
       .layout{grid-template-columns:1fr}
       .summary{position:static}
       .hero{flex-direction:column;align-items:flex-start}
-      .hero h1{font-size:42px}
+      .hero h1{font-size:44px}
     }
   </style>
 </head>
@@ -250,15 +248,14 @@
   <section class="hero">
     <div><h1>Find the right car<br/>for your life.</h1></div>
     <p>
-      Pick what applies. The more you select, the better the match.
-      Then jump into chat to refine it and find live deals.
+      Pick what applies. Get a match. Then continue to chat to refine it and open live deal searches.
     </p>
   </section>
 
   <section class="layout">
     <div class="panel">
       <h2>Your preferences</h2>
-      <p class="sub">Budget, type, usage, priorities, notes. Multi-select on everything.</p>
+      <p class="sub">Multi-select on everything. The more you pick, the better the match.</p>
 
       <div class="q">
         <div class="qtitle"><b>Budget</b><span>cash or monthly is fine</span></div>
@@ -316,7 +313,7 @@
 
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button id="matchBtn" class="btn primary" type="button" onclick="match()">Match me with a car</button>
-            <button class="btn" type="button" onclick="continueToChat()">Continue to chat</button>
+            <button id="chatBtn" class="btn" type="button" onclick="continueToChat()">Continue to chat</button>
           </div>
         </div>
       </div>
@@ -344,6 +341,7 @@
   const budget = document.getElementById("budget");
   const notes = document.getElementById("notes");
   const matchBtn = document.getElementById("matchBtn");
+  const chatBtn = document.getElementById("chatBtn");
 
   const results = document.getElementById("results");
   const resultsSub = document.getElementById("resultsSub");
@@ -388,32 +386,25 @@ Notes: ${n || "—"}`;
     budget.value = "";
     notes.value = "";
     allChecks().forEach(c => c.checked = false);
+
     results.style.display = "none";
     aiReply.innerHTML = "";
     clearError();
+
+    chatBtn.style.display = "none";
     matchBtn.disabled = false;
     matchBtn.textContent = "Match me with a car";
+
     renderText();
   }
 
   function continueToChat() {
     const picks = selected();
-
-    if (picks.length < 3) {
-      out.textContent = "Pick at least 3 chips first, then continue to chat.";
-      out.parentElement.animate(
-        [{ transform: "translateX(0px)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0px)" }],
-        { duration: 220, easing: "ease-out" }
-      );
-      return;
-    }
-
     const ctx = {
       budget: budget.value.trim(),
       picks,
       notes: notes.value.trim()
     };
-
     localStorage.setItem("automatch_ctx", JSON.stringify(ctx));
     window.location.href = "/chat.html";
   }
@@ -461,7 +452,7 @@ Notes: ${n || "—"}`;
     return html;
   }
 
-  function typewriter(el, fullText, { cps = 55 } = {}) {
+  function typewriter(el, fullText, { cps = 65 } = {}) {
     return new Promise((resolve) => {
       el.innerHTML = "";
       const pre = document.createElement("pre");
@@ -512,6 +503,7 @@ Notes: ${n || "—"}`;
     clearError();
     results.style.display = "none";
     aiReply.innerHTML = "";
+    chatBtn.style.display = "none";
 
     renderLoading();
     matchBtn.disabled = true;
@@ -548,8 +540,11 @@ Notes: ${n || "—"}`;
 
       const reply = data.reply || "No reply returned.";
 
-      await typewriter(aiReply, reply, { cps: 65 });
+      await typewriter(aiReply, reply, { cps: 70 });
       aiReply.innerHTML = formatReplyToHtml(reply);
+
+      // ✅ show chat only after a successful match finishes
+      chatBtn.style.display = "inline-flex";
 
     } catch (e) {
       matchBtn.disabled = false;
