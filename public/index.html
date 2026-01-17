@@ -186,24 +186,16 @@
       font-size:14px;
       overflow-wrap:anywhere;
     }
-    /* While typing, we show plain text */
     .reply pre{
       margin:0;
       white-space:pre-wrap;
-      font: inherit;
-      color: inherit;
+      font:inherit;
+      color:inherit;
       line-height:1.65;
     }
-
-    /* After formatting */
-    .reply .h{
-      margin:10px 0 6px;
-      font-weight:750;
-      color:#f3f4f6;
-    }
+    .reply .h{margin:10px 0 6px;font-weight:750;color:#f3f4f6}
     .reply ul{margin:8px 0 12px 18px;padding:0}
     .reply li{margin:6px 0;color:#dedede}
-    .reply .muted{color:#a3a3a3}
 
     .error{
       border:1px solid #3a1f1f;
@@ -259,7 +251,7 @@
     <div><h1>Find the right car<br/>for your life.</h1></div>
     <p>
       Pick what applies. The more you select, the better the match.
-      We’ll recommend UK-friendly options and explain why.
+      Then jump into chat to refine it and find live deals.
     </p>
   </section>
 
@@ -321,9 +313,11 @@
 
         <div class="actions">
           <button class="btn" type="button" onclick="resetAll()">Reset</button>
-          <button id="matchBtn" class="btn primary" type="button" onclick="match()">
-            Match me with a car
-          </button>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button id="matchBtn" class="btn primary" type="button" onclick="match()">Match me with a car</button>
+            <button class="btn" type="button" onclick="continueToChat()">Continue to chat</button>
+          </div>
         </div>
       </div>
     </div>
@@ -402,6 +396,28 @@ Notes: ${n || "—"}`;
     renderText();
   }
 
+  function continueToChat() {
+    const picks = selected();
+
+    if (picks.length < 3) {
+      out.textContent = "Pick at least 3 chips first, then continue to chat.";
+      out.parentElement.animate(
+        [{ transform: "translateX(0px)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0px)" }],
+        { duration: 220, easing: "ease-out" }
+      );
+      return;
+    }
+
+    const ctx = {
+      budget: budget.value.trim(),
+      picks,
+      notes: notes.value.trim()
+    };
+
+    localStorage.setItem("automatch_ctx", JSON.stringify(ctx));
+    window.location.href = "/chat.html";
+  }
+
   function escapeHtml(s) {
     return s.replace(/[&<>"']/g, c => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -445,7 +461,6 @@ Notes: ${n || "—"}`;
     return html;
   }
 
-  // FAST typewriter: updates textContent in batches per frame, then formats once at the end.
   function typewriter(el, fullText, { cps = 55 } = {}) {
     return new Promise((resolve) => {
       el.innerHTML = "";
@@ -463,10 +478,8 @@ Notes: ${n || "—"}`;
         const dt = Math.max(0, now - last);
         last = now;
 
-        // chars per ms
         const cpm = cps / 1000;
-        const toAdd = Math.max(1, Math.floor(dt * cpm * 1.8)); // slightly faster than cps feels nicer
-
+        const toAdd = Math.max(1, Math.floor(dt * cpm * 1.8));
         i = Math.min(fullText.length, i + toAdd);
         pre.textContent = fullText.slice(0, i);
 
@@ -477,7 +490,6 @@ Notes: ${n || "—"}`;
           resolve();
         }
       }
-
       requestAnimationFrame(tick);
     });
   }
@@ -494,7 +506,6 @@ Notes: ${n || "—"}`;
       return;
     }
 
-    // Cancel any in-flight request (prevents the page feeling stuck)
     if (activeController) activeController.abort();
     activeController = new AbortController();
 
@@ -537,10 +548,7 @@ Notes: ${n || "—"}`;
 
       const reply = data.reply || "No reply returned.";
 
-      // Type out quickly (no heavy formatting while typing)
       await typewriter(aiReply, reply, { cps: 65 });
-
-      // Now format once (clean + fast)
       aiReply.innerHTML = formatReplyToHtml(reply);
 
     } catch (e) {
@@ -548,10 +556,7 @@ Notes: ${n || "—"}`;
       matchBtn.textContent = "Match me with a car";
       renderText();
 
-      if (e?.name === "AbortError") {
-        // user clicked again; ignore
-        return;
-      }
+      if (e?.name === "AbortError") return;
 
       results.style.display = "block";
       resultsSub.textContent = "Network error (see error).";
@@ -573,4 +578,3 @@ Notes: ${n || "—"}`;
 
 </body>
 </html>
-
