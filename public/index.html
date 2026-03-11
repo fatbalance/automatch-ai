@@ -796,15 +796,29 @@ Notes: ${n || "—"}`;
     }[c]));
   }
 
+  function extractCarNameOnly(raw) {
+    if (!raw || typeof raw !== "string") return "";
+    let s = raw.trim();
+    const bold = s.match(/\*\*([^*]+)\*\*/);
+    if (bold) s = bold[1].trim();
+    s = s.replace(/\s*[–-]\s.*$/, "").replace(/\s*:\s*.*$/, "").trim();
+    return s.length > 2 && s.length < 80 ? s : "";
+  }
+
   function extractCarsFromText(text) {
     const cars = new Set();
-    const lines = (text || "").split("\n");
+    const block = (text || "").replace(/\r\n/g, "\n");
+    const lines = block.split("\n");
     for (const line of lines) {
-      const m = line.match(/^\d+\.\s+(.+)/);
-      if (m) {
-        let name = m[1].replace(/\s+[–-]\s.*$/, "").trim();
-        if (name.length > 2) cars.add(name);
+      let name = null;
+      const numMatch = line.match(/^\d+\.\s+(.+)/);
+      if (numMatch) {
+        name = extractCarNameOnly(numMatch[1]);
+      } else {
+        const boldMatch = line.match(/\*\*([^*]+)\*\*(?:\s*:|\s*$)/);
+        if (boldMatch) name = extractCarNameOnly(boldMatch[1]);
       }
+      if (name) cars.add(name);
     }
     return cars;
   }
