@@ -223,6 +223,17 @@
     .chat-input-row .btn{flex-shrink:0}
     .back-btn{margin-bottom:14px;color:#9a9a9a;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
     .back-btn:hover{color:#e6e6e6}
+    .chat-context-bar{
+      background:rgba(255,255,255,.04);
+      border:1px solid #1f1f1f;
+      border-radius:14px;
+      padding:12px 16px;
+      margin-bottom:16px;
+      font-size:13px;
+      color:#a3a3a3;
+      line-height:1.5;
+    }
+    .chat-context-bar strong{color:#d6d6d6}
 
     .reply{
       border:1px solid #1f1f1f;
@@ -359,6 +370,7 @@
 
   <section id="chatView" class="chat-view panel">
     <div class="back-btn" onclick="backToPrefs()">← Back to preferences</div>
+    <div id="chatContextBar" class="chat-context-bar"></div>
     <h2>Chat with your car advisor</h2>
     <p class="sub" id="chatSub">Discuss your options and get personalised advice.</p>
     <div id="errBoxChat" class="error"></div>
@@ -383,6 +395,18 @@
   const sendBtn = document.getElementById("sendBtn");
   const errBoxChat = document.getElementById("errBoxChat");
   const matchErrBox = document.getElementById("matchErrBox");
+  const chatContextBar = document.getElementById("chatContextBar");
+
+  const STORAGE_KEY = "automatch_chat";
+  const PICK_TO_ID = {
+    Hatchback: "t_hatch", SUV: "t_suv", Saloon: "t_saloon", Estate: "t_estate",
+    Coupe: "t_coupe", Electric: "t_electric", Hybrid: "t_hybrid",
+    "Daily commuting": "u_commute", "City driving": "u_city", "Long motorway trips": "u_motorway",
+    "Family use": "u_family", "First car": "u_first", "Fun / performance": "u_fun",
+    Reliability: "p_reliable", "Low running costs": "p_costs", "Low insurance": "p_ins",
+    Comfort: "p_comfort", Technology: "p_tech", Performance: "p_perf",
+    "Boot space": "p_space", "ULEZ friendly": "p_ulez"
+  };
 
   const allChecks = () => Array.from(document.querySelectorAll('input[type="checkbox"]'));
   const selected = () => allChecks().filter(c => c.checked).map(c => c.value);
@@ -433,6 +457,31 @@ Notes: ${n || "—"}`;
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
+  function updateContextBar() {
+    const c = chatContext;
+    const parts = [];
+    if (c.budget) parts.push(`<strong>Budget:</strong> ${escapeHtml(c.budget)}`);
+    if (c.picks && c.picks.length) parts.push(`<strong>Preferences:</strong> ${escapeHtml(c.picks.join(", "))}`);
+    if (c.notes) parts.push(`<strong>Notes:</strong> ${escapeHtml(c.notes)}`);
+    chatContextBar.innerHTML = parts.length ? parts.join(" · ") : "";
+    chatContextBar.style.display = parts.length ? "block" : "none";
+  }
+
+  function restoreFormFromContext(ctx) {
+    if (!ctx) return;
+    budget.value = ctx.budget || "";
+    notes.value = ctx.notes || "";
+    allChecks().forEach(c => { c.checked = false; });
+    (ctx.picks || []).forEach(p => {
+      const id = PICK_TO_ID[p];
+      if (id) {
+        const el = document.getElementById(id);
+        if (el) el.checked = true;
+      }
+    });
+    renderText();
+  }
+
   function switchToChatView(initialReply) {
     chatHistory = [
       { role: "user", content: buildInitialUserPrompt() },
@@ -440,10 +489,15 @@ Notes: ${n || "—"}`;
     ];
     chatContext = { budget: budget.value.trim(), picks: selected(), notes: notes.value.trim() };
 
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext }));
+    } catch (_) {}
+
     prefsView.classList.add("hidden");
     chatView.classList.add("active");
     chatMessages.innerHTML = "";
     appendChatMessage("assistant", initialReply);
+    updateContextBar();
     clearMatchError();
     clearChatError();
     chatInput.value = "";
@@ -460,6 +514,7 @@ Notes: ${n || "—"}`;
     chatMessages.innerHTML = "";
     clearMatchError();
     clearChatError();
+    chatContextBar.innerHTML = "";
   }
 
   function buildInitialUserPrompt() {
@@ -474,14 +529,41 @@ Notes: ${n || "—"}`;
   function resetAll() {
     if (activeController) activeController.abort();
     activeController = null;
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
     backToPrefs();
     budget.value = "";
     notes.value = "";
     allChecks().forEach(c => c.checked = false);
     matchBtn.disabled = false;
     matchBtn.textContent = "Match me with a car";
-
     renderText();
+  }
+
+  function restoreFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const { chatHistory: h, chatContext: c } = JSON.parse(raw);
+      if (!h || !h.length || !c) return false;
+      chatHistory = h;
+      chatContext = c;
+      restoreFormFromContext(c);
+      prefsView.classList.add("hidden");
+      chatView.classList.add("active");
+      chatMessages.innerHTML = "";
+      // AI speaks first: show assistant messages, skip the initial user prefs (shown in context bar)
+      let skipFirstUser = true;
+      h.forEach(m => {
+        if (m.role === "assistant") appendChatMessage("assistant", m.content);
+        else if (m.role === "user") {
+          if (skipFirstUser) skipFirstUser = false;
+          else appendChatMessage("user", m.content);
+        }
+      });
+      updateContextBar();
+      chatInput.value = "";
+      return true;
+    } catch (_) { return false; }
   }
 
   function typewriter(el, fullText, { cps = 70 } = {}) {
@@ -610,6 +692,7 @@ Notes: ${n || "—"}`;
       const reply = data.reply || "No reply returned.";
       chatHistory.push({ role: "assistant", content: reply });
       appendChatMessage("assistant", reply);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext })); } catch (_) {}
     } catch (e) {
       if (e?.name !== "AbortError") showChatError(e?.message || String(e));
     } finally {
@@ -631,7 +714,7 @@ Notes: ${n || "—"}`;
   budget.addEventListener("input", renderText);
   notes.addEventListener("input", renderText);
 
-  renderText();
+  if (!restoreFromStorage()) renderText();
 </script>
 
 </body>

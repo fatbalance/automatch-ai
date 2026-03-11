@@ -55,14 +55,15 @@ export default async function handler(req, res) {
         `Notes: ${notes || "None"}`,
         "",
         "Task:",
-        "Recommend 3 cars that suit the user in the UK market.",
-        "For each: give a 1-line reason + 3 short bullets (pros/cons or key points).",
-        "Then ask 1 short follow-up question to improve the match.",
-        "Keep it concise and practical.",
+        "The user has just shared their preferences. You speak first.",
+        "Open with a brief friendly greeting (1 sentence) that acknowledges their choices, then recommend 3 cars that suit them in the UK market.",
+        "For each car: give a 1-line reason + 3 short bullets (pros/cons or key points).",
+        "End with 1 short follow-up question to improve the match.",
+        "Keep it concise and practical. You are initiating the conversation.",
       ].join("\n");
 
       messages = [
-        { role: "system", content: "You are a practical UK car advisor. Be concise, specific, and not salesy." },
+        { role: "system", content: "You are a practical UK car advisor. Be concise, specific, and not salesy. When the user shares preferences, you always speak first with a warm opener before your recommendations." },
         { role: "user", content: userPrompt },
       ];
     }
