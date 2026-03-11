@@ -571,41 +571,57 @@ Notes: ${n || "—"}`;
     }[c]));
   }
 
-  function getStreamingBlocks(text) {
+  function getStreamingWords(text) {
     const lines = (text || "").split("\n");
-    const blocks = [];
+    const tokens = [];
     let inList = false;
     let inCarDesc = false;
-    const closeList = () => { if (inList) { blocks.push({ html: "</ul>", words: 0 }); inList = false; } };
+    const closeList = () => { if (inList) { tokens.push({ html: "</ul>", word: false }); inList = false; } };
+    const addWordTokens = (words) => {
+      words.forEach((w, i) => {
+        const space = i > 0 ? " " : "";
+        tokens.push({ html: space + `<span class="stream-block">${escapeHtml(w)}</span>`, word: true });
+      });
+    };
     for (let raw of lines) {
       const t = raw.trim();
-      if (!t) { closeList(); inCarDesc = false; blocks.push({ html: "<div style='height:10px'></div>", words: 0 }); continue; }
+      if (!t) { closeList(); inCarDesc = false; tokens.push({ html: "<div style='height:10px'></div>", word: false }); continue; }
       if (/^[-*•]\s+/.test(t)) {
         inCarDesc = false;
-        if (!inList) { blocks.push({ html: "<ul>", words: 0 }); inList = true; }
+        if (!inList) { tokens.push({ html: "<ul>", word: false }); inList = true; }
         const content = "• " + t.replace(/^[-*•]\s+/, "");
-        blocks.push({ html: `<li class="stream-block">${escapeHtml(content)}</li>`, words: content.split(/\s+/).filter(Boolean).length });
+        tokens.push({ html: "<li>", word: false });
+        addWordTokens(content.split(/\s+/).filter(Boolean));
+        tokens.push({ html: "</li>", word: false });
         continue;
       }
       closeList();
       if (/^\d+\.\s+/.test(t)) {
         inCarDesc = true;
-        blocks.push({ html: `<div class="car-title stream-block">${escapeHtml(t)}</div>`, words: t.split(/\s+/).filter(Boolean).length });
+        tokens.push({ html: "<div class='car-title'>", word: false });
+        addWordTokens(t.split(/\s+/).filter(Boolean));
+        tokens.push({ html: "</div>", word: false });
         continue;
       }
       if (inCarDesc) {
-        blocks.push({ html: `<div class="car-desc stream-block">${escapeHtml(t)}</div>`, words: t.split(/\s+/).filter(Boolean).length });
+        tokens.push({ html: "<div class='car-desc'>", word: false });
+        addWordTokens(t.split(/\s+/).filter(Boolean));
+        tokens.push({ html: "</div>", word: false });
         continue;
       }
       if (t.length <= 48 && /:$/.test(t)) {
         const c = t.replace(/:$/, "");
-        blocks.push({ html: `<div class="h stream-block">${escapeHtml(c)}</div>`, words: c.split(/\s+/).filter(Boolean).length });
+        tokens.push({ html: "<div class='h'>", word: false });
+        addWordTokens(c.split(/\s+/).filter(Boolean));
+        tokens.push({ html: "</div>", word: false });
         continue;
       }
-      blocks.push({ html: `<div class="stream-block">${escapeHtml(t)}</div>`, words: t.split(/\s+/).filter(Boolean).length });
+      tokens.push({ html: "<div>", word: false });
+      addWordTokens(t.split(/\s+/).filter(Boolean));
+      tokens.push({ html: "</div>", word: false });
     }
     closeList();
-    return blocks;
+    return tokens;
   }
 
   function formatReplyToHtmlPlain(text) {
@@ -644,12 +660,12 @@ Notes: ${n || "—"}`;
   }
 
   function streamAssistantMessage(div, content) {
-    const blocks = getStreamingBlocks(content);
+    const tokens = getStreamingWords(content);
     let delay = 0;
-    blocks.forEach((b) => {
-      const ms = Math.max(60, (b.words || 1) * 80);
+    tokens.forEach((t) => {
+      const ms = t.word ? 90 : 0;
       setTimeout(() => {
-        div.insertAdjacentHTML("beforeend", b.html);
+        div.insertAdjacentHTML("beforeend", t.html);
         scrollChatToBottom();
       }, delay);
       delay += ms;
