@@ -260,7 +260,7 @@
       max-height:110px;
       padding:16px 20px;
       resize:none;
-      overflow-y:auto;
+      overflow-y:hidden;
       border-radius:22px;
       border:1px solid #2a2a2a;
       background:#0d0d0d;
@@ -832,7 +832,7 @@ Notes: ${n || "—"}`;
     if (!text) return;
 
     chatInput.value = "";
-    chatInput.style.height = "auto";
+    resizeChatInput();
     appendChatMessage("user", text);
     chatHistory.push({ role: "user", content: text });
 
@@ -876,8 +876,10 @@ Notes: ${n || "—"}`;
 
   function resizeChatInput() {
     chatInput.style.height = "auto";
-    const h = Math.max(56, Math.min(chatInput.scrollHeight, 110));
+    const sh = chatInput.scrollHeight;
+    const h = Math.max(56, Math.min(sh, 110));
     chatInput.style.height = h + "px";
+    chatInput.style.overflowY = sh > 110 ? "auto" : "hidden";
   }
 
   chatInput.addEventListener("input", resizeChatInput);
