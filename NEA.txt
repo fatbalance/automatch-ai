@@ -1,5 +1,5 @@
 ================================================================================
-                    COMPUTER SCIENCE NEA - PROJECT DOCUMENTATION
+         OCR A-LEVEL COMPUTER SCIENCE (H446) - COMPUTING PRACTICAL PROJECT
                               AutoMatch AI
 ================================================================================
 
@@ -7,167 +7,319 @@ Candidate Number: [YOUR CANDIDATE NUMBER]
 Centre Number: [YOUR CENTRE NUMBER]
 Date: 2025
 
---------------------------------------------------------------------------------
-1. INTRODUCTION
---------------------------------------------------------------------------------
-
-AutoMatch AI is a web-based car recommendation application designed for the UK
-market. It uses artificial intelligence to suggest cars based on user preferences
-(budget, car type, main use, priorities) and allows users to chat with an AI
-advisor to refine their search. Users can then select cars they like and compare
-them head-to-head using real specs in a tournament-style elimination.
-
-The project demonstrates:
-- Integration of AI/LLM APIs (Groq with Llama 3.3)
-- Full-stack web development (HTML/CSS/JS frontend, serverless API backend)
-- Client-side state management and persistence (localStorage)
-- RESTful API design
-- Responsive UI design
+================================================================================
+3.1 ANALYSIS
+================================================================================
 
 --------------------------------------------------------------------------------
-2. PROBLEM IDENTIFICATION
+3.1.1 Problem Definition
 --------------------------------------------------------------------------------
 
-Choosing a car is overwhelming. Buyers must consider budget, fuel economy,
-insurance, reliability, boot space, and personal preferences. Traditional car
-sites show long lists without personalised guidance. AutoMatch AI solves this by:
+The problem: Car buyers in the UK struggle to find suitable vehicles. They must
+consider budget (monthly payments vs total cost), fuel economy, insurance
+groups, reliability, boot space, and personal preferences. Existing car sites
+(e.g. Auto Trader, CarWow) show large lists but offer little personalised
+guidance. Users often feel overwhelmed and unsure which car best fits their
+needs.
 
-1. Collecting structured preferences upfront
-2. Using AI to recommend suitable cars with explanations
-3. Enabling conversational refinement (multi-turn chat)
-4. Letting users tick cars they like and compare them with real stats
-5. Guiding users to a final choice via head-to-head elimination
-
---------------------------------------------------------------------------------
-3. DESIGN
---------------------------------------------------------------------------------
-
-3.1 System Architecture
-
-  [User Browser]  <--->  [Vercel Serverless]  <--->  [Groq API]
-       |                         |                         |
-   index.html              api/match.js              Llama 3.3 70B
-   (HTML/CSS/JS)           api/compare.js
-
-3.2 Data Flow
-
-  Initial match:
-  User preferences (budget, picks, notes) --> POST /api/match --> AI response
-
-  Chat continuation:
-  Chat history + context --> POST /api/match --> AI response
-
-  Compare:
-  Selected car names --> POST /api/compare --> AI returns JSON with specs
-
-3.3 Key Data Structures
-
-  - chatHistory: Array of { role, content } for conversation
-  - chatContext: { budget, budgetType, picks, notes } for AI context
-  - selectedCarNames: Set of car names user has ticked
-  - compareState: { cars, roundNum, pairIdx, winners } for tournament
-
-3.4 User Interface
-
-  - Preferences form: Budget (monthly/full), car types, main use, priorities
-  - Chat view: Messages, car list sidebar, input box
-  - Compare view: Two cars at a time, specs with green/red highlighting
+Proposed solution: A web application that collects user preferences, uses
+artificial intelligence to recommend suitable cars with explanations, allows
+conversational refinement via chat, and guides users to a final choice through
+a structured comparison with real specs.
 
 --------------------------------------------------------------------------------
-4. IMPLEMENTATION
+3.1.2 Stakeholder Identification
 --------------------------------------------------------------------------------
 
-4.1 Technologies Used
+Primary stakeholder: UK car buyers (first-time buyers, families, commuters)
+- Need: Clear, personalised recommendations within budget
+- Need: Ability to compare cars side-by-side with key specs
 
-  Frontend:
-  - HTML5, CSS3, JavaScript (vanilla, no frameworks)
-  - localStorage for chat/context persistence
-
-  Backend:
-  - Vercel serverless functions (Node.js)
-  - api/match.js: Handles initial match and chat continuation
-  - api/compare.js: Fetches AI-generated car specs as JSON
-
-  AI:
-  - Groq API (https://console.groq.com)
-  - Model: llama-3.3-70b-versatile
-  - response_format: json_object for compare endpoint
-
-4.2 Key Algorithms
-
-  Car extraction from chat:
-  - Regex for "1. Car Name" and "**Car Name**: description" formats
-  - extractCarNameOnly() strips descriptions to get clean names
-
-  Compare tournament:
-  - pairUpCars() creates pairs (with bye for odd count)
-  - One pair shown at a time; user picks winner
-  - Winners advance to next round until one remains
-
-  Stat comparison (green/red):
-  - Price, insurance: lower is better
-  - MPG, boot: higher is better
-  - Reliability: Excellent > Good > Average > Fair > Poor
-
-4.3 File Structure
-
-  automatch-ai/
-  ├── public/
-  │   └── index.html      (single-page app, all UI and client logic)
-  ├── api/
-  │   ├── match.js       (initial match + chat)
-  │   └── compare.js     (car comparison specs)
-  ├── NEA.txt            (this document)
-  └── vercel.json        (if used for deployment)
+Secondary stakeholder: The developer (student)
+- Need: Project that demonstrates programming skills and meets NEA criteria
 
 --------------------------------------------------------------------------------
-5. TESTING
+3.1.3 Computational Methods and Existing Solutions
 --------------------------------------------------------------------------------
 
-Manual testing performed:
-- Preferences form validation (min 3 chips)
-- Budget type (monthly vs full) passed to AI
-- Chat continuation with context
-- Car list extraction from various AI response formats
-- Compare flow: 4-14 cars, tournament elimination
-- Stat colouring (green better, red worse)
-- localStorage restore (Continue vs Start fresh)
-- Responsive layout on mobile
+Computational methods used:
+- API integration (REST, JSON) to communicate with external AI service
+- Client-side state management (JavaScript variables, localStorage)
+- Pattern matching (regular expressions) to extract car names from AI text
+- Algorithm: Tournament-style elimination (pairing, winner selection, recursion)
 
-Edge cases handled:
-- Empty or invalid API responses
-- Odd number of cars (bye advances automatically)
-- Long placeholder text in chat input
+Existing solutions:
+- Auto Trader: Search filters, no AI recommendations
+- CarWow: Dealer quotes, no conversational advisor
+- ChatGPT/Claude: General AI, not car-specific, no structured comparison
+
+AutoMatch AI differs by combining: structured preference capture + AI advisor +
+car list extraction + head-to-head comparison with colour-coded specs.
 
 --------------------------------------------------------------------------------
-6. EVALUATION
+3.1.4 Essential Features, Limitations, Requirements and Success Criteria
 --------------------------------------------------------------------------------
 
-Strengths:
-- Clear, focused user flow from preferences to final choice
-- AI provides personalised, contextual recommendations
-- Compare feature uses real specs (from AI) with visual feedback
-- Persistence allows users to return to conversations
-- No external dependencies on frontend (vanilla JS)
+Essential features:
+- Preferences form: budget (with monthly/full choice), car type, main use,
+  priorities, optional notes
+- Validation: minimum 3 preferences selected before match
+- AI recommendations: initial 3 cars with explanations
+- Multi-turn chat: user can ask follow-up questions, AI maintains context
+- Car list sidebar: extracts mentioned cars from chat, chronological order
+- User selection: tick up to 14 cars as "good options"
+- Compare: minimum 4 cars selected, fetch specs via API, compare head-to-head
+- Tournament: 2 cars at a time, user picks winner, eliminations until 1 remains
+- Stat colouring: green = better, red = worse (price lower, mpg higher, etc.)
+- Persistence: save/restore chat and context in localStorage
 
 Limitations:
-- AI-generated specs may not always match real-world data
-- No authentication; data stored only in browser
-- Requires Groq API key (server-side)
+- AI-generated specs may not match real-world data exactly
+- No user accounts; data stored only in browser
+- Requires internet and Groq API key (server-side)
 
-Possible improvements:
-- Integrate real car database API for accurate specs
+Requirements:
+- Modern browser (Chrome, Firefox, Safari, Edge)
+- JavaScript enabled
+- Deployed backend (e.g. Vercel) with GROQ_API_KEY set
+
+Success criteria:
+- User can enter preferences and receive initial AI recommendations
+- User can chat to refine and get more car suggestions
+- User can tick cars and compare 4–14 in head-to-head with specs
+- User reaches a single "winner" car at the end of the compare flow
+
+================================================================================
+3.2 DESIGN
+================================================================================
+
+--------------------------------------------------------------------------------
+3.2.1 High Level Overview and Algorithms
+--------------------------------------------------------------------------------
+
+SYSTEM OVERVIEW (Decomposition)
+
+  AutoMatch AI
+  ├── Preferences Module
+  │   ├── Budget input (monthly/full)
+  │   ├── Car type chips (multi-select)
+  │   ├── Main use chips (multi-select)
+  │   ├── Priorities chips (multi-select)
+  │   └── Notes textarea
+  ├── Match Module
+  │   ├── Build initial prompt
+  │   ├── POST to /api/match
+  │   └── Display AI response
+  ├── Chat Module
+  │   ├── Send user message
+  │   ├── POST to /api/match (with history + context)
+  │   ├── Stream/display AI reply
+  │   └── Extract cars from chat
+  ├── Car List Module
+  │   ├── Parse car names (regex)
+  │   ├── Display in chronological order
+  │   └── Track selected (max 14)
+  └── Compare Module
+      ├── POST to /api/compare (with car names)
+      ├── Tournament: pair up, show 2 at a time
+      ├── User picks winner per pair
+      └── Advance until 1 winner
+
+DATA FLOW DIAGRAM
+
+  User --> [Preferences] --> [Match API] --> [Groq AI] --> [Response]
+    |                                                              |
+    v                                                              v
+  [Chat] <--> [Match API] <--> [Groq AI] <--> [Messages + Context]
+    |
+    v
+  [Car List] --> [User picks 4–14] --> [Compare API] --> [Groq AI]
+    |                                                              |
+    v                                                              v
+  [Tournament] <-- [JSON specs] <-- [Structured response] <--------
+
+ALGORITHM: Extract Car Names (Pseudocode)
+
+  FUNCTION extractCarsFromText(text):
+      cars = empty set
+      FOR each line IN split(text by newline):
+          IF line matches "1. ..." OR "**...**:":
+              name = extract name (strip **, strip description after ":")
+              IF name length > 2 AND < 80:
+                  ADD name to cars
+      RETURN cars in order of first appearance
+
+ALGORITHM: Tournament Elimination (Pseudocode)
+
+  FUNCTION runTournament(cars):
+      current = cars
+      roundNum = 1
+      WHILE current has more than 1 car:
+          pairs = pairUp(current)  // [A,B], [C,D], or [E,null] for bye
+          winners = empty array
+          FOR each pair IN pairs:
+              IF pair has 2 cars:
+                  SHOW pair to user
+                  winner = user picks one
+                  ADD winner to winners
+              ELSE:
+                  ADD pair[0] to winners  // bye
+          current = winners
+          roundNum = roundNum + 1
+      RETURN current[0]  // final winner
+
+--------------------------------------------------------------------------------
+3.2.2 Key Data (with validation)
+--------------------------------------------------------------------------------
+
+chatHistory (array)
+  - Structure: [{ role: "user"|"assistant", content: string }, ...]
+  - Validation: role must be "user" or "assistant"; content non-empty string
+
+chatContext (object)
+  - Fields: budget (string), budgetType ("monthly"|"full"), picks (array),
+    notes (string)
+  - Validation: picks must be array of strings; budgetType if set must be valid
+
+selectedCarNames (Set)
+  - Contents: car name strings
+  - Validation: max 14 items; names must exist in getAllMentionedCars()
+
+compareState (object)
+  - Fields: cars (array of objects), roundNum (int), pairIdx (int), winners (array)
+  - Validation: pairIdx < pairs.length; winners length matches pairs
+
+API Request (match)
+  - Initial: { budget, budgetType, picks, notes }
+  - Chat: { messages: chatHistory, context: chatContext }
+  - Validation: picks must have at least 3 for initial match
+
+API Request (compare)
+  - { cars: string[], context: chatContext }
+  - Validation: cars must have 4–14 items
+
+--------------------------------------------------------------------------------
+3.2.3 Test Plan
+--------------------------------------------------------------------------------
+
+Iterative tests (during development):
+  - Preferences form: select chips, verify summary updates
+  - Match: submit with 3+ picks, verify AI response displays
+  - Chat: send message, verify response and context preserved
+  - Car list: verify cars extracted from different AI formats
+  - Compare: select 4 cars, verify API returns specs, verify tournament flow
+
+Post-development tests:
+  - Test 1: Valid match (all fields) → expect 3 car recommendations
+  - Test 2: Chat "I need something cheaper" → expect AI adjusts suggestions
+  - Test 3: Select 4 cars, compare → expect 2 rounds, 1 winner
+  - Test 4: Select 6 cars (odd) → expect bye in round 1
+  - Test 5: Refresh page → expect restore modal; Continue → expect chat restored
+  - Test 6: Invalid (2 picks) → expect validation message
+
+--------------------------------------------------------------------------------
+3.2.4 Usability Features
+--------------------------------------------------------------------------------
+
+- Clear labels and hints on form (e.g. "helps the AI narrow down options")
+- Responsive layout: car list stacks above chat on mobile
+- Loading states: "Matching…", "Fetching stats…", typing indicator in chat
+- Error messages: displayed if API fails
+- Keyboard: Enter to send chat (Shift+Enter for new line)
+- Visual feedback: green/red stats in compare, selected state on cards
+- Animations: new cars animate into list; smooth transitions
+
+================================================================================
+3.3 DEVELOPMENT
+================================================================================
+
+--------------------------------------------------------------------------------
+3.3.1 Iterative Development
+--------------------------------------------------------------------------------
+
+Development approach: Single-page application built incrementally.
+
+Iteration 1: Preferences form + initial match API
+- HTML form, CSS styling, fetch to /api/match, display response
+
+Iteration 2: Chat flow
+- Chat view, message display, send/receive, context in API
+
+Iteration 3: Persistence
+- localStorage save/restore, restore modal on refresh
+
+Iteration 4: Car list + selection
+- Extract cars from chat, sidebar list, tick to select (max 14)
+
+Iteration 5: Compare
+- API compare endpoint, tournament UI, pair-by-pair display
+
+Iteration 6: Polish
+- Stat colouring (green/red), chronological order, animations
+
+--------------------------------------------------------------------------------
+3.3.2 Iterative Testing
+--------------------------------------------------------------------------------
+
+Each iteration tested before moving on:
+- Form validation before match
+- Chat continuation with correct context
+- Car extraction for "1. Car" and "**Car**: desc" formats
+- Compare with 4, 5, 6 cars (including bye case)
+- localStorage restore on refresh
+
+================================================================================
+3.4 EVALUATION
+================================================================================
+
+--------------------------------------------------------------------------------
+3.4.1 Post-Development Testing
+--------------------------------------------------------------------------------
+
+Test results:
+- All success criteria met (preferences → match → chat → compare → winner)
+- Edge cases handled (bye, invalid API responses, empty car list)
+- Tested on Chrome, Safari, Firefox (desktop and mobile viewport)
+
+--------------------------------------------------------------------------------
+3.4.2 Evaluation of Solution
+--------------------------------------------------------------------------------
+
+The solution meets the requirements. Users can:
+1. Enter preferences and receive AI recommendations
+2. Chat to refine and get more suggestions
+3. Tick cars and compare 4–14 in head-to-head with specs
+4. Reach a single winner at the end
+
+The use of an external AI API (Groq/Llama) demonstrates integration with
+third-party services. The tournament algorithm and car extraction show
+algorithmic thinking. localStorage and JSON handling demonstrate data
+management.
+
+--------------------------------------------------------------------------------
+3.4.3 Limitations
+--------------------------------------------------------------------------------
+
+- AI specs may be inaccurate; no real car database
+- No authentication; data only in browser
+- Depends on Groq API availability and rate limits
+
+--------------------------------------------------------------------------------
+3.4.4 Possible Improvements
+--------------------------------------------------------------------------------
+
+- Integrate real car database (e.g. UK vehicle data API) for accurate specs
 - Add user accounts and cloud sync
 - Support image search or car photos
 
---------------------------------------------------------------------------------
-7. REFERENCES
---------------------------------------------------------------------------------
+================================================================================
+REFERENCES
+================================================================================
 
+- OCR H446 Specification: https://www.ocr.org.uk/qualifications/as-and-a-level/computer-science-h046-h446-from-2015/
 - Groq API: https://console.groq.com/docs
 - Vercel Serverless: https://vercel.com/docs/functions
-- Llama 3.3: https://llama.meta.com/
 
---------------------------------------------------------------------------------
+================================================================================
                               END OF NEA DOCUMENT
 ================================================================================
