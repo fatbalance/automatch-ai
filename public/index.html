@@ -177,67 +177,116 @@
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
     /* Chat view - replaces preferences after match */
-    .chat-view{display:none;animation:fadeIn .25s ease both}
+    .chat-view{display:none;animation:fadeIn .3s ease both}
     .chat-view.active{display:block}
     .prefs-view.hidden{display:none !important}
     .chat-messages{
-      max-height:420px;
+      max-height:440px;
       overflow-y:auto;
-      padding:8px 0 16px;
+      overflow-x:hidden;
+      padding:12px 0 20px;
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap:16px;
+      scroll-behavior:smooth;
     }
+    .chat-messages::-webkit-scrollbar{width:6px}
+    .chat-messages::-webkit-scrollbar-track{background:transparent}
+    .chat-messages::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
     .chat-msg{
-      max-width:88%;
-      padding:14px 18px;
-      border-radius:18px;
-      line-height:1.6;
-      font-size:14px;
+      max-width:85%;
+      padding:16px 20px;
+      border-radius:20px;
+      line-height:1.65;
+      font-size:15px;
+      animation:msgIn .35s ease both;
+    }
+    @keyframes msgIn{
+      from{opacity:0;transform:translateY(12px) scale(0.98)}
+      to{opacity:1;transform:translateY(0) scale(1)}
     }
     .chat-msg.user{
       align-self:flex-end;
-      background:rgba(255,255,255,.08);
-      border:1px solid #2a2a2a;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
     }
     .chat-msg.assistant{
       align-self:flex-start;
-      background:#0e0e0e;
-      border:1px solid #1f1f1f;
-      color:#e6e6e6;
+      background:#141414;
+      border:1px solid #252525;
+      color:#e8e8e8;
     }
     .chat-msg.assistant pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit}
-    .chat-msg .h{margin:10px 0 6px;font-weight:750;color:#f3f4f6}
+    .chat-msg .h{margin:12px 0 6px;font-weight:750;color:#f5f5f5}
     .chat-msg .h:first-child{margin-top:0}
-    .chat-msg ul{margin:8px 0 12px 18px;padding:0}
-    .chat-msg li{margin:6px 0;color:#dedede}
+    .chat-msg ul{margin:10px 0 14px 20px;padding:0}
+    .chat-msg li{margin:6px 0;color:#d8d8d8}
+    .typing-indicator{
+      align-self:flex-start;
+      padding:16px 20px;
+      border-radius:20px;
+      background:#141414;
+      border:1px solid #252525;
+      font-size:14px;
+      color:#9a9a9a;
+      animation:msgIn .3s ease both;
+    }
+    .typing-indicator .dots span{
+      display:inline-block;width:4px;height:4px;border-radius:50%;
+      background:#9a9a9a;opacity:.5;animation:typingBounce 1.2s infinite;
+    }
+    .typing-indicator .dots span:nth-child(2){animation-delay:.15s}
+    .typing-indicator .dots span:nth-child(3){animation-delay:.3s}
+    @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
     .chat-input-row{
       display:flex;
-      gap:10px;
+      gap:12px;
       align-items:flex-end;
-      margin-top:12px;
+      margin-top:16px;
     }
     .chat-input-row textarea{
       flex:1;
-      min-height:48px;
-      max-height:120px;
-      padding:12px 16px;
+      min-height:52px;
+      max-height:140px;
+      padding:14px 18px;
       resize:none;
+      border-radius:18px;
+      border:1px solid #2a2a2a;
+      background:#0d0d0d;
+      color:#fff;
+      font-size:15px;
+      line-height:1.5;
+      transition:border-color .2s ease,box-shadow .2s ease;
     }
+    .chat-input-row textarea:focus{
+      outline:none;
+      border-color:#3a3a3a;
+      box-shadow:0 0 0 1px rgba(255,255,255,.06);
+    }
+    .chat-input-row textarea::placeholder{color:#6a6a6a}
     .chat-input-row .btn{flex-shrink:0}
-    .back-btn{margin-bottom:14px;color:#9a9a9a;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-    .back-btn:hover{color:#e6e6e6}
-    .chat-context-bar{
-      background:rgba(255,255,255,.04);
-      border:1px solid #1f1f1f;
-      border-radius:14px;
-      padding:12px 16px;
-      margin-bottom:16px;
+    .back-btn{
+      margin-bottom:12px;
+      color:#7a7a7a;
       font-size:13px;
-      color:#a3a3a3;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      transition:color .15s ease;
+    }
+    .back-btn:hover{color:#c8c8c8}
+    .chat-context-bar{
+      background:rgba(255,255,255,.03);
+      border:1px solid #1a1a1a;
+      border-radius:12px;
+      padding:10px 14px;
+      margin-bottom:14px;
+      font-size:12px;
+      color:#8a8a8a;
       line-height:1.5;
     }
-    .chat-context-bar strong{color:#d6d6d6}
+    .chat-context-bar strong{color:#b8b8b8;font-weight:600}
 
     .reply{
       border:1px solid #1f1f1f;
@@ -380,7 +429,7 @@
     <div id="errBoxChat" class="error"></div>
     <div id="chatMessages" class="chat-messages"></div>
     <div class="chat-input-row">
-      <textarea id="chatInput" placeholder="Ask a follow-up question, compare cars, or refine your search…" rows="1"></textarea>
+      <textarea id="chatInput" placeholder="Ask anything… compare cars, get more details, refine your search" rows="1"></textarea>
       <button id="sendBtn" class="btn primary" type="button" onclick="sendChat()">Send</button>
     </div>
   </section>
@@ -492,7 +541,27 @@ Notes: ${n || "—"}`;
     div.className = `chat-msg ${role}`;
     div.innerHTML = formatReplyToHtml(content);
     chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    scrollChatToBottom();
+  }
+
+  function showTypingIndicator() {
+    const el = document.createElement("div");
+    el.className = "typing-indicator";
+    el.id = "typingIndicator";
+    el.innerHTML = 'Thinking<span class="dots"><span></span><span></span><span></span></span>';
+    chatMessages.appendChild(el);
+    scrollChatToBottom();
+  }
+
+  function hideTypingIndicator() {
+    const el = document.getElementById("typingIndicator");
+    if (el) el.remove();
+  }
+
+  function scrollChatToBottom() {
+    requestAnimationFrame(() => {
+      chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: "smooth" });
+    });
   }
 
   function updateContextBar() {
@@ -704,14 +773,17 @@ Notes: ${n || "—"}`;
     if (!text) return;
 
     chatInput.value = "";
+    chatInput.style.height = "auto";
     appendChatMessage("user", text);
     chatHistory.push({ role: "user", content: text });
 
     sendBtn.disabled = true;
+    sendBtn.textContent = "…";
     clearChatError();
 
     if (activeController) activeController.abort();
     activeController = new AbortController();
+    showTypingIndicator();
 
     try {
       const r = await fetch("/api/match", {
@@ -721,6 +793,8 @@ Notes: ${n || "—"}`;
         signal: activeController.signal,
       });
       const data = await r.json();
+
+      hideTypingIndicator();
 
       if (!r.ok) {
         showChatError(JSON.stringify(data, null, 2));
@@ -732,12 +806,21 @@ Notes: ${n || "—"}`;
       appendChatMessage("assistant", reply);
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext })); } catch (_) {}
     } catch (e) {
+      hideTypingIndicator();
       if (e?.name !== "AbortError") showChatError(e?.message || String(e));
     } finally {
       sendBtn.disabled = false;
+      sendBtn.textContent = "Send";
       activeController = null;
     }
   }
+
+  function resizeChatInput() {
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + "px";
+  }
+
+  chatInput.addEventListener("input", resizeChatInput);
 
   chatInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
