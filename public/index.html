@@ -1068,7 +1068,7 @@ Notes: ${n || "—"}`;
     chatContext = { budget: budget.value.trim(), budgetType: getBudgetType(), picks: selected(), notes: notes.value.trim() };
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext, selectedCarNames: [] }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext }));
     } catch (_) {}
 
     prefsView.classList.add("hidden");
@@ -1256,11 +1256,11 @@ Notes: ${n || "—"}`;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
-      const { chatHistory: h, chatContext: c, selectedCarNames: s } = JSON.parse(raw);
+      const { chatHistory: h, chatContext: c } = JSON.parse(raw);
       if (!h || !h.length || !c) return false;
       chatHistory = h;
       chatContext = c;
-      if (Array.isArray(s)) selectedCarNames = new Set(s);
+      selectedCarNames.clear();
       restoreFormFromContext(c);
       prefsView.classList.add("hidden");
       chatView.classList.add("active");
@@ -1442,7 +1442,7 @@ Notes: ${n || "—"}`;
       chatHistory.push({ role: "assistant", content: reply });
       appendChatMessage("assistant", reply);
       updateCarList();
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext, selectedCarNames: Array.from(selectedCarNames) })); } catch (_) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext })); } catch (_) {}
     } catch (e) {
       hideTypingIndicator();
       if (e?.name !== "AbortError") showChatError(e?.message || String(e));
