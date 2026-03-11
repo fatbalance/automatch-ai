@@ -56,10 +56,19 @@ export default async function handler(req, res) {
         "",
         "Task:",
         "The user has just shared their preferences. You speak first.",
-        "Open with a brief friendly greeting (1 sentence) that acknowledges their choices, then recommend 3 cars that suit them in the UK market.",
-        "For each car: give a 1-line reason + 3 short bullets (pros/cons or key points).",
-        "End with 1 short follow-up question to improve the match.",
-        "Keep it concise and practical. You are initiating the conversation.",
+        "Open with a brief friendly greeting (1 sentence), then recommend 3 cars that suit them in the UK market.",
+        "",
+        "Format each car like this:",
+        "1. [Car name – e.g. Honda Civic, Volkswagen Golf]",
+        "[Short paragraph, 2–3 sentences, explaining why it suits them]",
+        "",
+        "2. [Car name]",
+        "[Short paragraph]",
+        "",
+        "3. [Car name]",
+        "[Short paragraph]",
+        "",
+        "End with 1 short follow-up question. Keep it concise and practical.",
       ].join("\n");
 
       messages = [
