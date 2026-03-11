@@ -336,7 +336,7 @@
     }
     .chat-input-row textarea{
       flex:1;
-      min-height:56px;
+      min-height:72px;
       max-height:110px;
       padding:16px 20px;
       resize:none;
@@ -1124,6 +1124,7 @@ Notes: ${n || "—"}`;
     chatInput.value = "";
     chatInput.focus();
     updateCarList();
+    requestAnimationFrame(() => { resizeChatInput(); setTimeout(resizeChatInput, 50); });
   }
 
   function goToCompare() {
@@ -1137,6 +1138,7 @@ Notes: ${n || "—"}`;
   function backFromCompare() {
     compareView.classList.remove("active");
     chatView.classList.add("active");
+    requestAnimationFrame(() => resizeChatInput());
   }
 
   async function fetchAndRenderCompare(cars) {
@@ -1294,6 +1296,7 @@ Notes: ${n || "—"}`;
       updateContextBar();
       chatInput.value = "";
       updateCarList();
+      requestAnimationFrame(() => { resizeChatInput(); setTimeout(resizeChatInput, 50); });
       return true;
     } catch (_) { return false; }
   }
@@ -1471,7 +1474,7 @@ Notes: ${n || "—"}`;
   function resizeChatInput() {
     chatInput.style.height = "auto";
     const sh = chatInput.scrollHeight;
-    const h = Math.max(56, Math.min(sh, 110));
+    const h = Math.max(72, Math.min(sh, 110));
     chatInput.style.height = h + "px";
     chatInput.style.overflowY = sh > 110 ? "auto" : "hidden";
   }
