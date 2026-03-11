@@ -894,16 +894,53 @@ Notes: ${n || "—"}`;
       }
       closeList();
       if (/^\d+\.\s+/.test(t)) {
-        inCarDesc = true;
-        tokens.push({ html: "<div class='car-title'>", word: false });
-        addWordTokens(t.split(/\s+/).filter(Boolean));
-        tokens.push({ html: "</div>", word: false });
+        const colonIdx = t.indexOf("**:");
+        if (colonIdx >= 0) {
+          const titlePart = t.slice(0, colonIdx).replace(/\*\*/g, "").trim();
+          const descPart = t.slice(colonIdx + 3).trim();
+          inCarDesc = true;
+          tokens.push({ html: "<div class='car-title'>", word: false });
+          addWordTokens(titlePart.split(/\s+/).filter(Boolean));
+          tokens.push({ html: "</div>", word: false });
+          if (descPart) {
+            tokens.push({ html: "<div class='car-desc'>", word: false });
+            addWordTokens(descPart.split(/\s+/).filter(Boolean));
+            tokens.push({ html: "</div>", word: false });
+          }
+        } else {
+          inCarDesc = true;
+          tokens.push({ html: "<div class='car-title'>", word: false });
+          addWordTokens(t.split(/\s+/).filter(Boolean));
+          tokens.push({ html: "</div>", word: false });
+        }
         continue;
       }
       if (inCarDesc) {
         tokens.push({ html: "<div class='car-desc'>", word: false });
         addWordTokens(t.split(/\s+/).filter(Boolean));
         tokens.push({ html: "</div>", word: false });
+        continue;
+      }
+      if (/^\*\*[^*]+\*\*:/.test(t)) {
+        closeList();
+        const colonIdx = t.indexOf("**:");
+        if (colonIdx >= 0) {
+          const titlePart = t.slice(0, colonIdx).replace(/\*\*/g, "").trim();
+          const descPart = t.slice(colonIdx + 3).trim();
+          inCarDesc = true;
+          tokens.push({ html: "<div class='car-title'>", word: false });
+          addWordTokens(titlePart.split(/\s+/).filter(Boolean));
+          tokens.push({ html: "</div>", word: false });
+          if (descPart) {
+            tokens.push({ html: "<div class='car-desc'>", word: false });
+            addWordTokens(descPart.split(/\s+/).filter(Boolean));
+            tokens.push({ html: "</div>", word: false });
+          }
+        } else {
+          tokens.push({ html: "<div>", word: false });
+          addWordTokens(t.split(/\s+/).filter(Boolean));
+          tokens.push({ html: "</div>", word: false });
+        }
         continue;
       }
       if (t.length <= 48 && /:$/.test(t)) {
@@ -938,12 +975,35 @@ Notes: ${n || "—"}`;
       }
       closeList();
       if (/^\d+\.\s+/.test(t)) {
-        inCarDesc = true;
-        html += `<div class="car-title">${escapeHtml(t)}</div>`;
+        const colonIdx = t.indexOf("**:");
+        if (colonIdx >= 0) {
+          const titlePart = t.slice(0, colonIdx).replace(/\*\*/g, "").trim();
+          const descPart = t.slice(colonIdx + 3).trim();
+          inCarDesc = true;
+          html += `<div class="car-title">${escapeHtml(titlePart)}</div>`;
+          if (descPart) html += `<div class="car-desc">${escapeHtml(descPart)}</div>`;
+        } else {
+          inCarDesc = true;
+          html += `<div class="car-title">${escapeHtml(t)}</div>`;
+        }
         continue;
       }
       if (inCarDesc) {
         html += `<div class="car-desc">${escapeHtml(t)}</div>`;
+        continue;
+      }
+      if (/^\*\*[^*]+\*\*:/.test(t)) {
+        closeList();
+        const colonIdx = t.indexOf("**:");
+        if (colonIdx >= 0) {
+          const titlePart = t.slice(0, colonIdx).replace(/\*\*/g, "").trim();
+          const descPart = t.slice(colonIdx + 3).trim();
+          inCarDesc = true;
+          html += `<div class="car-title">${escapeHtml(titlePart)}</div>`;
+          if (descPart) html += `<div class="car-desc">${escapeHtml(descPart)}</div>`;
+        } else {
+          html += `<div>${escapeHtml(t)}</div>`;
+        }
         continue;
       }
       if (t.length <= 48 && /:$/.test(t)) {
