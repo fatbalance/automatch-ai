@@ -229,7 +229,7 @@
       color:#e8e8e8;
     }
     .chat-msg.assistant pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit}
-    .chat-msg.assistant .word{opacity:0;animation:wordIn .4s ease forwards}
+    .chat-msg.assistant .stream-block{opacity:0;animation:wordIn .35s ease forwards}
     @keyframes wordIn{to{opacity:1}}
     .chat-msg .h{margin:12px 0 6px;font-weight:750;color:#f5f5f5}
     .chat-msg .h:first-child{margin-top:0}
@@ -571,48 +571,41 @@ Notes: ${n || "—"}`;
     }[c]));
   }
 
-  function formatReplyToHtml(text) {
+  function getStreamingBlocks(text) {
     const lines = (text || "").split("\n");
-    let html = "";
+    const blocks = [];
     let inList = false;
     let inCarDesc = false;
-    let wordIndex = 0;
-    const closeList = () => { if (inList) { html += "</ul>"; inList = false; } };
-    const addWords = (t) => {
-      const words = t.split(/\s+/).filter(Boolean);
-      const out = words.map((w, i) =>
-        `<span class="word" style="animation-delay:${(wordIndex + i) * 0.1}s">${escapeHtml(w)}</span>`
-      ).join(" ");
-      wordIndex += words.length;
-      return out;
-    };
+    const closeList = () => { if (inList) { blocks.push({ html: "</ul>", words: 0 }); inList = false; } };
     for (let raw of lines) {
       const t = raw.trim();
-      if (!t) { closeList(); inCarDesc = false; html += `<div style="height:10px"></div>`; continue; }
+      if (!t) { closeList(); inCarDesc = false; blocks.push({ html: "<div style='height:10px'></div>", words: 0 }); continue; }
       if (/^[-*•]\s+/.test(t)) {
         inCarDesc = false;
-        if (!inList) { html += "<ul>"; inList = true; }
-        html += `<li>${addWords("• " + t.replace(/^[-*•]\s+/, ""))}</li>`;
+        if (!inList) { blocks.push({ html: "<ul>", words: 0 }); inList = true; }
+        const content = "• " + t.replace(/^[-*•]\s+/, "");
+        blocks.push({ html: `<li class="stream-block">${escapeHtml(content)}</li>`, words: content.split(/\s+/).filter(Boolean).length });
         continue;
       }
       closeList();
       if (/^\d+\.\s+/.test(t)) {
         inCarDesc = true;
-        html += `<div class="car-title">${addWords(t)}</div>`;
+        blocks.push({ html: `<div class="car-title stream-block">${escapeHtml(t)}</div>`, words: t.split(/\s+/).filter(Boolean).length });
         continue;
       }
       if (inCarDesc) {
-        html += `<div class="car-desc">${addWords(t)}</div>`;
+        blocks.push({ html: `<div class="car-desc stream-block">${escapeHtml(t)}</div>`, words: t.split(/\s+/).filter(Boolean).length });
         continue;
       }
       if (t.length <= 48 && /:$/.test(t)) {
-        html += `<div class="h">${addWords(t.replace(/:$/, ""))}</div>`;
+        const c = t.replace(/:$/, "");
+        blocks.push({ html: `<div class="h stream-block">${escapeHtml(c)}</div>`, words: c.split(/\s+/).filter(Boolean).length });
         continue;
       }
-      html += `<div>${addWords(t)}</div>`;
+      blocks.push({ html: `<div class="stream-block">${escapeHtml(t)}</div>`, words: t.split(/\s+/).filter(Boolean).length });
     }
     closeList();
-    return html || escapeHtml(text || "");
+    return blocks;
   }
 
   function formatReplyToHtmlPlain(text) {
@@ -650,18 +643,35 @@ Notes: ${n || "—"}`;
     return html || escapeHtml(text || "");
   }
 
+  function streamAssistantMessage(div, content) {
+    const blocks = getStreamingBlocks(content);
+    let delay = 0;
+    blocks.forEach((b) => {
+      const ms = Math.max(60, (b.words || 1) * 80);
+      setTimeout(() => {
+        div.insertAdjacentHTML("beforeend", b.html);
+        scrollChatToBottom();
+      }, delay);
+      delay += ms;
+    });
+  }
+
   function appendChatMessage(role, content, opts = {}) {
     const animate = opts.animate !== false;
     const wrap = document.createElement("div");
     wrap.className = `chat-msg-wrap ${role}`;
     const div = document.createElement("div");
     div.className = `chat-msg ${role}`;
-    div.innerHTML = role === "assistant"
-      ? (animate ? formatReplyToHtml(content) : formatReplyToHtmlPlain(content))
-      : formatReplyToHtmlPlain(content);
-    wrap.appendChild(div);
-    chatMessages.appendChild(wrap);
-    scrollChatToBottom();
+    if (role === "assistant" && animate) {
+      chatMessages.appendChild(wrap);
+      wrap.appendChild(div);
+      streamAssistantMessage(div, content);
+    } else {
+      div.innerHTML = role === "assistant" ? formatReplyToHtmlPlain(content) : formatReplyToHtmlPlain(content);
+      wrap.appendChild(div);
+      chatMessages.appendChild(wrap);
+      scrollChatToBottom();
+    }
   }
 
   function showTypingIndicator() {
