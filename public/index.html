@@ -194,14 +194,20 @@
       padding:24px 0 32px;
       display:flex;
       flex-direction:column;
-      align-items:flex-start;
       gap:24px;
       scroll-behavior:smooth;
     }
+    .chat-msg-wrap{
+      width:100%;
+      display:flex;
+    }
+    .chat-msg-wrap.assistant{justify-content:flex-start}
+    .chat-msg-wrap.user{justify-content:flex-end}
     .chat-messages::-webkit-scrollbar{width:6px}
     .chat-messages::-webkit-scrollbar-track{background:transparent}
     .chat-messages::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
     .chat-msg{
+      display:inline-block;
       max-width:85%;
       padding:20px 24px;
       border-radius:22px;
@@ -214,13 +220,10 @@
       to{opacity:1;transform:translateY(0) scale(1)}
     }
     .chat-msg.user{
-      align-self:flex-end;
-      margin-left:auto;
       background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
     }
     .chat-msg.assistant{
-      align-self:flex-start;
       background:#141414;
       border:1px solid #252525;
       color:#e8e8e8;
@@ -247,7 +250,7 @@
     .chat-msg ul{margin:10px 0 14px 20px;padding:0;list-style:none}
     .chat-msg li{margin:6px 0;color:#d8d8d8;padding-left:0}
     .typing-indicator{
-      align-self:flex-start;
+      display:inline-block;
       padding:20px 24px;
       border-radius:22px;
       background:#141414;
@@ -649,27 +652,33 @@ Notes: ${n || "—"}`;
 
   function appendChatMessage(role, content, opts = {}) {
     const animate = opts.animate !== false;
+    const wrap = document.createElement("div");
+    wrap.className = `chat-msg-wrap ${role}`;
     const div = document.createElement("div");
     div.className = `chat-msg ${role}`;
     div.innerHTML = role === "assistant"
       ? (animate ? formatReplyToHtml(content) : formatReplyToHtmlPlain(content))
       : formatReplyToHtmlPlain(content);
-    chatMessages.appendChild(div);
+    wrap.appendChild(div);
+    chatMessages.appendChild(wrap);
     scrollChatToBottom();
   }
 
   function showTypingIndicator() {
+    const wrap = document.createElement("div");
+    wrap.className = "chat-msg-wrap assistant";
     const el = document.createElement("div");
     el.className = "typing-indicator";
     el.id = "typingIndicator";
     el.innerHTML = 'Thinking<span class="dots"><span></span><span></span><span></span></span>';
-    chatMessages.appendChild(el);
+    wrap.appendChild(el);
+    chatMessages.appendChild(wrap);
     scrollChatToBottom();
   }
 
   function hideTypingIndicator() {
     const el = document.getElementById("typingIndicator");
-    if (el) el.remove();
+    if (el && el.parentElement) el.parentElement.remove();
   }
 
   function scrollChatToBottom() {
