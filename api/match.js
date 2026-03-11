@@ -5,11 +5,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Read body safely
     const body = req.body || {};
-    const budget = (body.budget ?? "").toString().trim();
-    const picks = Array.isArray(body.picks) ? body.picks.map(String) : [];
-    const notes = (body.notes ?? "").toString().trim();
 
     // Ensure API key exists (set in Vercel env vars)
     if (!process.env.GROQ_API_KEY) {
@@ -19,22 +15,57 @@ export default async function handler(req, res) {
       });
     }
 
-    // You can swap this model if you want:
-    // - "llama-3.3-70b-versatile" (strong, good reasoning)
-    // - "llama-3.1-8b-instant" (faster/cheaper)
     const MODEL = "llama-3.3-70b-versatile";
 
-    const userPrompt = [
-      `Budget: ${budget || "Not provided"}`,
-      `Preferences: ${picks.length ? picks.join(", ") : "None selected"}`,
-      `Notes: ${notes || "None"}`,
-      "",
-      "Task:",
-      "Recommend 3 cars that suit the user in the UK market.",
-      "For each: give a 1-line reason + 3 short bullets (pros/cons or key points).",
-      "Then ask 1 short follow-up question to improve the match.",
-      "Keep it concise and practical.",
-    ].join("\n");
+    let messages;
+
+    // Chat continuation: messages array provided
+    const chatMessages = Array.isArray(body.messages) ? body.messages : [];
+    const context = body.context || {};
+
+    if (chatMessages.length > 0) {
+      const budget = (context.budget ?? "").toString().trim();
+      const picks = Array.isArray(context.picks) ? context.picks.map(String) : [];
+      const notes = (context.notes ?? "").toString().trim();
+      const contextBlurb = [
+        budget && `Budget: ${budget}`,
+        picks.length && `Preferences: ${picks.join(", ")}`,
+        notes && `Notes: ${notes}`,
+      ]
+        .filter(Boolean)
+        .join(". ");
+
+      const systemContent =
+        "You are a practical UK car advisor. Be concise, specific, and not salesy." +
+        (contextBlurb ? ` The user's initial context: ${contextBlurb}` : "");
+
+      messages = [
+        { role: "system", content: systemContent },
+        ...chatMessages.map((m) => ({ role: m.role, content: String(m.content || "").trim() })),
+      ];
+    } else {
+      // Initial request: budget, picks, notes
+      const budget = (body.budget ?? "").toString().trim();
+      const picks = Array.isArray(body.picks) ? body.picks.map(String) : [];
+      const notes = (body.notes ?? "").toString().trim();
+
+      const userPrompt = [
+        `Budget: ${budget || "Not provided"}`,
+        `Preferences: ${picks.length ? picks.join(", ") : "None selected"}`,
+        `Notes: ${notes || "None"}`,
+        "",
+        "Task:",
+        "Recommend 3 cars that suit the user in the UK market.",
+        "For each: give a 1-line reason + 3 short bullets (pros/cons or key points).",
+        "Then ask 1 short follow-up question to improve the match.",
+        "Keep it concise and practical.",
+      ].join("\n");
+
+      messages = [
+        { role: "system", content: "You are a practical UK car advisor. Be concise, specific, and not salesy." },
+        { role: "user", content: userPrompt },
+      ];
+    }
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -45,13 +76,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: MODEL,
         temperature: 0.7,
-        messages: [
-          {
-            role: "system",
-            content: "You are a practical UK car advisor. Be concise, specific, and not salesy.",
-          },
-          { role: "user", content: userPrompt },
-        ],
+        messages,
       }),
     });
 

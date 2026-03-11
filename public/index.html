@@ -176,6 +176,54 @@
     .results{margin-top:18px;display:none;animation:fadeIn .25s ease both}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
+    /* Chat view - replaces preferences after match */
+    .chat-view{display:none;animation:fadeIn .25s ease both}
+    .chat-view.active{display:block}
+    .prefs-view.hidden{display:none !important}
+    .chat-messages{
+      max-height:420px;
+      overflow-y:auto;
+      padding:8px 0 16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .chat-msg{
+      max-width:88%;
+      padding:14px 18px;
+      border-radius:18px;
+      line-height:1.6;
+      font-size:14px;
+    }
+    .chat-msg.user{
+      align-self:flex-end;
+      background:rgba(255,255,255,.08);
+      border:1px solid #2a2a2a;
+    }
+    .chat-msg.assistant{
+      align-self:flex-start;
+      background:#0e0e0e;
+      border:1px solid #1f1f1f;
+      color:#e6e6e6;
+    }
+    .chat-msg.assistant pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit}
+    .chat-input-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+      margin-top:12px;
+    }
+    .chat-input-row textarea{
+      flex:1;
+      min-height:48px;
+      max-height:120px;
+      padding:12px 16px;
+      resize:none;
+    }
+    .chat-input-row .btn{flex-shrink:0}
+    .back-btn{margin-bottom:14px;color:#9a9a9a;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+    .back-btn:hover{color:#e6e6e6}
+
     .reply{
       border:1px solid #1f1f1f;
       background:#0e0e0e;
@@ -236,7 +284,7 @@
     </p>
   </section>
 
-  <section class="layout">
+  <section id="prefsView" class="layout prefs-view">
     <div class="panel">
       <h2>Your preferences</h2>
       <p class="sub">Multi-select on everything. The more you pick, the better the match.</p>
@@ -292,6 +340,7 @@
         <div class="qtitle"><b>Anything else</b><span>optional</span></div>
         <textarea id="notes" placeholder="Brands you like/dislike, insurance concerns, mileage, must-have features…"></textarea>
 
+        <div id="matchErrBox" class="error"></div>
         <div class="actions">
           <button class="btn" type="button" onclick="resetAll()">Reset</button>
           <button id="matchBtn" class="btn primary" type="button" onclick="match()">Match me with a car</button>
@@ -308,12 +357,18 @@
     </aside>
   </section>
 
-  <section id="results" class="panel results">
-    <h2>Your AI match</h2>
-    <p class="sub" id="resultsSub">Generating…</p>
-    <div id="errBox" class="error"></div>
-    <div id="aiReply" class="reply"></div>
+  <section id="chatView" class="chat-view panel">
+    <div class="back-btn" onclick="backToPrefs()">← Back to preferences</div>
+    <h2>Chat with your car advisor</h2>
+    <p class="sub" id="chatSub">Discuss your options and get personalised advice.</p>
+    <div id="errBoxChat" class="error"></div>
+    <div id="chatMessages" class="chat-messages"></div>
+    <div class="chat-input-row">
+      <textarea id="chatInput" placeholder="Ask a follow-up question, compare cars, or refine your search…" rows="1"></textarea>
+      <button id="sendBtn" class="btn primary" type="button" onclick="sendChat()">Send</button>
+    </div>
   </section>
+
 </main>
 
 <script>
@@ -321,16 +376,20 @@
   const budget = document.getElementById("budget");
   const notes = document.getElementById("notes");
   const matchBtn = document.getElementById("matchBtn");
-
-  const results = document.getElementById("results");
-  const resultsSub = document.getElementById("resultsSub");
-  const aiReply = document.getElementById("aiReply");
-  const errBox = document.getElementById("errBox");
+  const prefsView = document.getElementById("prefsView");
+  const chatView = document.getElementById("chatView");
+  const chatMessages = document.getElementById("chatMessages");
+  const chatInput = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const errBoxChat = document.getElementById("errBoxChat");
+  const matchErrBox = document.getElementById("matchErrBox");
 
   const allChecks = () => Array.from(document.querySelectorAll('input[type="checkbox"]'));
   const selected = () => allChecks().filter(c => c.checked).map(c => c.value);
 
   let activeController = null;
+  let chatHistory = [];
+  let chatContext = {};
 
   function renderText() {
     const picks = selected();
@@ -345,27 +404,80 @@ ${picks.length ? "- " + picks.join("\n- ") : "—"}
 Notes: ${n || "—"}`;
   }
 
-  function showError(message) {
-    errBox.style.display = "block";
-    errBox.textContent = message;
+  function renderLoading() {
+    out.innerHTML = `<span class="loader">Matching<span class="dots"><span></span><span></span><span></span></span></span>`;
   }
-  function clearError() {
-    errBox.style.display = "none";
-    errBox.textContent = "";
+
+  function showMatchError(message) {
+    matchErrBox.style.display = "block";
+    matchErrBox.textContent = message;
+  }
+  function showChatError(message) {
+    errBoxChat.style.display = "block";
+    errBoxChat.textContent = message;
+  }
+  function clearMatchError() {
+    matchErrBox.style.display = "none";
+    matchErrBox.textContent = "";
+  }
+  function clearChatError() {
+    errBoxChat.style.display = "none";
+    errBoxChat.textContent = "";
+  }
+
+  function appendChatMessage(role, content) {
+    const div = document.createElement("div");
+    div.className = `chat-msg ${role}`;
+    div.innerHTML = formatReplyToHtml(content);
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function switchToChatView(initialReply) {
+    chatHistory = [
+      { role: "user", content: buildInitialUserPrompt() },
+      { role: "assistant", content: initialReply },
+    ];
+    chatContext = { budget: budget.value.trim(), picks: selected(), notes: notes.value.trim() };
+
+    prefsView.classList.add("hidden");
+    chatView.classList.add("active");
+    chatMessages.innerHTML = "";
+    appendChatMessage("assistant", initialReply);
+    clearMatchError();
+    clearChatError();
+    chatInput.value = "";
+    chatInput.focus();
+  }
+
+  function backToPrefs() {
+    if (activeController) activeController.abort();
+    activeController = null;
+    prefsView.classList.remove("hidden");
+    chatView.classList.remove("active");
+    chatHistory = [];
+    chatContext = {};
+    chatMessages.innerHTML = "";
+    clearMatchError();
+    clearChatError();
+  }
+
+  function buildInitialUserPrompt() {
+    const picks = selected();
+    return [
+      `Budget: ${budget.value?.trim() || "Not provided"}`,
+      `Preferences: ${picks.length ? picks.join(", ") : "None"}`,
+      `Notes: ${notes.value?.trim() || "None"}`,
+    ].join("\n");
   }
 
   function resetAll() {
     if (activeController) activeController.abort();
     activeController = null;
-
+    backToPrefs();
     budget.value = "";
     notes.value = "";
     allChecks().forEach(c => c.checked = false);
-
-    results.style.display = "none";
-    aiReply.innerHTML = "";
-    clearError();
-
     matchBtn.disabled = false;
     matchBtn.textContent = "Match me with a car";
 
@@ -420,9 +532,7 @@ Notes: ${n || "—"}`;
     if (activeController) activeController.abort();
     activeController = new AbortController();
 
-    clearError();
-    results.style.display = "none";
-    aiReply.innerHTML = "";
+    clearMatchError();
 
     matchBtn.disabled = true;
     matchBtn.textContent = "Matching…";
@@ -447,32 +557,14 @@ Notes: ${n || "—"}`;
       matchBtn.textContent = "Match me with a car";
       renderText();
 
-      resultsSub.textContent = `Based on: ${picks.slice(0, 7).join(", ")}${picks.length > 7 ? "…" : ""}`;
-      results.style.display = "block";
-      results.scrollIntoView({ behavior: "smooth", block: "start" });
-
       if (!r.ok) {
-        showError(JSON.stringify(data, null, 2));
+        showMatchError(JSON.stringify(data, null, 2));
         return;
       }
 
       const reply = data.reply || "No reply returned.";
-
-      // show a quick typed confirmation so it feels responsive
-      await typewriter(aiReply, reply, { cps: 85 });
-
-      // save context + seed reply for chat page
-      localStorage.setItem("automatch_ctx", JSON.stringify({
-        budget: budget.value.trim(),
-        picks,
-        notes: notes.value.trim()
-      }));
-      localStorage.setItem("automatch_seed", reply);
-
-      // short pause then redirect
-      setTimeout(() => {
-        window.location.href = "/chat.html";
-      }, 450);
+      switchToChatView(reply);
+      chatView.scrollIntoView({ behavior: "smooth", block: "start" });
 
     } catch (e) {
       matchBtn.disabled = false;
@@ -481,14 +573,57 @@ Notes: ${n || "—"}`;
 
       if (e?.name === "AbortError") return;
 
-      results.style.display = "block";
-      resultsSub.textContent = "Network error (see error).";
-      showError(e?.message || String(e));
-      results.scrollIntoView({ behavior: "smooth", block: "start" });
+      showMatchError(e?.message || String(e));
     } finally {
       activeController = null;
     }
   }
+
+  async function sendChat() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    chatInput.value = "";
+    appendChatMessage("user", text);
+    chatHistory.push({ role: "user", content: text });
+
+    sendBtn.disabled = true;
+    clearChatError();
+
+    if (activeController) activeController.abort();
+    activeController = new AbortController();
+
+    try {
+      const r = await fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: chatHistory, context: chatContext }),
+        signal: activeController.signal,
+      });
+      const data = await r.json();
+
+      if (!r.ok) {
+        showChatError(JSON.stringify(data, null, 2));
+        return;
+      }
+
+      const reply = data.reply || "No reply returned.";
+      chatHistory.push({ role: "assistant", content: reply });
+      appendChatMessage("assistant", reply);
+    } catch (e) {
+      if (e?.name !== "AbortError") showChatError(e?.message || String(e));
+    } finally {
+      sendBtn.disabled = false;
+      activeController = null;
+    }
+  }
+
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendChat();
+    }
+  });
 
   document.addEventListener("change", (e) => {
     if (e.target.matches('input[type="checkbox"]')) renderText();
