@@ -233,6 +233,13 @@
     .car-list-item.selected .tick{background:#e5e7eb;border-color:#e5e7eb}
     .car-list-item span.name{flex:1;font-size:14px;color:#e6e6e6}
     .car-list-item.selected span.name{color:#fff}
+    .car-list-item.animate-in{
+      animation:carItemIn .35s ease forwards;
+    }
+    @keyframes carItemIn{
+      from{opacity:0;transform:translateY(-8px)}
+      to{opacity:1;transform:translateY(0)}
+    }
     .car-list-sidebar .count{font-size:12px;color:#8a8a8a;margin-top:12px}
     .car-list-sidebar .compare-btn{
       margin-top:14px;
@@ -781,21 +788,28 @@ Notes: ${n || "—"}`;
   }
 
   function getAllMentionedCars() {
-    const cars = new Set();
+    const seen = new Set();
+    const order = [];
     for (const m of chatHistory) {
       if (m.role === "assistant" && m.content) {
-        extractCarsFromText(m.content).forEach(c => cars.add(c));
+        for (const name of extractCarsFromText(m.content)) {
+          if (!seen.has(name)) { seen.add(name); order.push(name); }
+        }
       }
     }
-    return Array.from(cars).sort();
+    return order;
   }
+
+  let prevCarList = [];
 
   function updateCarList() {
     const cars = getAllMentionedCars();
+    const newNames = new Set(cars.filter(c => !prevCarList.includes(c)));
+    prevCarList = cars.slice();
     carListEl.innerHTML = "";
     for (const name of cars) {
       const item = document.createElement("label");
-      item.className = "car-list-item" + (selectedCarNames.has(name) ? " selected" : "");
+      item.className = "car-list-item" + (selectedCarNames.has(name) ? " selected" : "") + (newNames.has(name) ? " animate-in" : "");
       item.innerHTML = `<span class="tick">${selectedCarNames.has(name) ? "✓" : ""}</span><span class="name">${escapeHtml(name)}</span>`;
       item.dataset.car = name;
       const input = document.createElement("input");
