@@ -1135,7 +1135,7 @@ Notes: ${n || "—"}`;
         return;
       }
 
-      compareState = { cars: carList, roundNum: 1 };
+      compareState = { cars: carList, roundNum: 1, pairIdx: 0 };
       renderCompareRound();
     } catch (e) {
       compareContent.innerHTML = `<div class="error">${escapeHtml(e?.message || "Network error")}</div>`;
@@ -1168,52 +1168,64 @@ Notes: ${n || "—"}`;
   }
 
   function renderCompareRound() {
-    const { cars, roundNum } = compareState;
+    const { cars, roundNum, pairIdx } = compareState;
     if (cars.length === 1) {
       compareContent.innerHTML = `<div class="compare-winner"><div class="label">Your winner</div><div class="car-name">${escapeHtml(cars[0].name || "—")}</div></div>`;
       return;
     }
     const pairs = pairUpCars(cars);
-    let html = `<div class="compare-round-label">Round ${roundNum}</div>`;
+    if (compareState.winners === undefined) compareState.winners = pairs.map(p => (p[1] === null ? p[0] : null));
+    const pair = pairs[pairIdx];
+    if (!pair) {
+      compareState.cars = compareState.winners.filter(Boolean);
+      compareState.roundNum++;
+      compareState.pairIdx = 0;
+      delete compareState.winners;
+      setTimeout(() => renderCompareRound(), 300);
+      return;
+    }
+    const [a, b] = pair;
+    let html = `<div class="compare-round-label">Round ${roundNum} · Match ${pairIdx + 1} of ${pairs.length}</div>`;
     html += `<p class="compare-pick-prompt">Compare the specs and pick your favourite</p>`;
     html += `<div class="compare-head2head">`;
-    pairs.forEach((pair) => {
-      const [a, b] = pair;
-      if (!b) {
-        html += renderCarCard(a);
-        html += `<div class="compare-card" style="cursor:default;opacity:.7"><div class="car-name">Bye</div><p style="color:#8a8a8a;margin:0">Advances automatically</p></div>`;
-      } else {
-        html += renderCarCard(a);
-        html += renderCarCard(b);
-      }
-    });
+    if (!b) {
+      html += renderCarCard(a);
+      html += `<div class="compare-card" style="cursor:default;opacity:.7"><div class="car-name">Bye</div><p style="color:#8a8a8a;margin:0">Advances automatically</p></div>`;
+    } else {
+      html += renderCarCard(a);
+      html += renderCarCard(b);
+    }
     html += "</div>";
     compareContent.innerHTML = html;
 
-    const winners = pairs.map(p => (p[1] === null ? p[0] : null));
-    compareContent.querySelectorAll(".compare-card[data-name]").forEach((el, idx) => {
-      const name = el.dataset.name;
-      if (!name) return;
-      const pairIdx = Math.floor(idx / 2);
-      const pair = pairs[pairIdx];
-      if (pair && pair[1] === null) return;
-      el.addEventListener("click", () => {
-        const p = pairs[pairIdx];
-        if (!p || p[1] === null) return;
-        const winner = p[0].name === name ? p[0] : p[1];
-        winners[pairIdx] = winner;
-        compareContent.querySelectorAll(".compare-card").forEach((c, j) => {
-          const pi = Math.floor(j / 2);
-          if (pi === pairIdx) c.classList.toggle("selected", c.dataset.name === name);
-        });
-        const allPicked = winners.every(w => w !== null);
-        if (allPicked) {
-          compareState.cars = winners.filter(Boolean);
-          compareState.roundNum++;
+    if (b) {
+      compareContent.querySelectorAll(".compare-card[data-name]").forEach((el) => {
+        const name = el.dataset.name;
+        if (!name) return;
+        el.addEventListener("click", () => {
+          const winner = a.name === name ? a : b;
+          compareState.winners[pairIdx] = winner;
+          compareContent.querySelectorAll(".compare-card").forEach(c => c.classList.toggle("selected", c.dataset.name === name));
+          compareState.pairIdx++;
+          if (compareState.pairIdx >= pairs.length) {
+            compareState.cars = compareState.winners.filter(Boolean);
+            compareState.roundNum++;
+            compareState.pairIdx = 0;
+            delete compareState.winners;
+          }
           setTimeout(() => renderCompareRound(), 400);
-        }
+        });
       });
-    });
+    } else {
+      compareState.pairIdx++;
+      if (compareState.pairIdx >= pairs.length) {
+        compareState.cars = compareState.winners.filter(Boolean);
+        compareState.roundNum++;
+        compareState.pairIdx = 0;
+        delete compareState.winners;
+      }
+      setTimeout(() => renderCompareRound(), 300);
+    }
   }
 
   function backToPrefs() {
