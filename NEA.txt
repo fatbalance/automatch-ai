@@ -1,0 +1,173 @@
+================================================================================
+                    COMPUTER SCIENCE NEA - PROJECT DOCUMENTATION
+                              AutoMatch AI
+================================================================================
+
+Candidate Number: [YOUR CANDIDATE NUMBER]
+Centre Number: [YOUR CENTRE NUMBER]
+Date: 2025
+
+--------------------------------------------------------------------------------
+1. INTRODUCTION
+--------------------------------------------------------------------------------
+
+AutoMatch AI is a web-based car recommendation application designed for the UK
+market. It uses artificial intelligence to suggest cars based on user preferences
+(budget, car type, main use, priorities) and allows users to chat with an AI
+advisor to refine their search. Users can then select cars they like and compare
+them head-to-head using real specs in a tournament-style elimination.
+
+The project demonstrates:
+- Integration of AI/LLM APIs (Groq with Llama 3.3)
+- Full-stack web development (HTML/CSS/JS frontend, serverless API backend)
+- Client-side state management and persistence (localStorage)
+- RESTful API design
+- Responsive UI design
+
+--------------------------------------------------------------------------------
+2. PROBLEM IDENTIFICATION
+--------------------------------------------------------------------------------
+
+Choosing a car is overwhelming. Buyers must consider budget, fuel economy,
+insurance, reliability, boot space, and personal preferences. Traditional car
+sites show long lists without personalised guidance. AutoMatch AI solves this by:
+
+1. Collecting structured preferences upfront
+2. Using AI to recommend suitable cars with explanations
+3. Enabling conversational refinement (multi-turn chat)
+4. Letting users tick cars they like and compare them with real stats
+5. Guiding users to a final choice via head-to-head elimination
+
+--------------------------------------------------------------------------------
+3. DESIGN
+--------------------------------------------------------------------------------
+
+3.1 System Architecture
+
+  [User Browser]  <--->  [Vercel Serverless]  <--->  [Groq API]
+       |                         |                         |
+   index.html              api/match.js              Llama 3.3 70B
+   (HTML/CSS/JS)           api/compare.js
+
+3.2 Data Flow
+
+  Initial match:
+  User preferences (budget, picks, notes) --> POST /api/match --> AI response
+
+  Chat continuation:
+  Chat history + context --> POST /api/match --> AI response
+
+  Compare:
+  Selected car names --> POST /api/compare --> AI returns JSON with specs
+
+3.3 Key Data Structures
+
+  - chatHistory: Array of { role, content } for conversation
+  - chatContext: { budget, budgetType, picks, notes } for AI context
+  - selectedCarNames: Set of car names user has ticked
+  - compareState: { cars, roundNum, pairIdx, winners } for tournament
+
+3.4 User Interface
+
+  - Preferences form: Budget (monthly/full), car types, main use, priorities
+  - Chat view: Messages, car list sidebar, input box
+  - Compare view: Two cars at a time, specs with green/red highlighting
+
+--------------------------------------------------------------------------------
+4. IMPLEMENTATION
+--------------------------------------------------------------------------------
+
+4.1 Technologies Used
+
+  Frontend:
+  - HTML5, CSS3, JavaScript (vanilla, no frameworks)
+  - localStorage for chat/context persistence
+
+  Backend:
+  - Vercel serverless functions (Node.js)
+  - api/match.js: Handles initial match and chat continuation
+  - api/compare.js: Fetches AI-generated car specs as JSON
+
+  AI:
+  - Groq API (https://console.groq.com)
+  - Model: llama-3.3-70b-versatile
+  - response_format: json_object for compare endpoint
+
+4.2 Key Algorithms
+
+  Car extraction from chat:
+  - Regex for "1. Car Name" and "**Car Name**: description" formats
+  - extractCarNameOnly() strips descriptions to get clean names
+
+  Compare tournament:
+  - pairUpCars() creates pairs (with bye for odd count)
+  - One pair shown at a time; user picks winner
+  - Winners advance to next round until one remains
+
+  Stat comparison (green/red):
+  - Price, insurance: lower is better
+  - MPG, boot: higher is better
+  - Reliability: Excellent > Good > Average > Fair > Poor
+
+4.3 File Structure
+
+  automatch-ai/
+  ├── public/
+  │   └── index.html      (single-page app, all UI and client logic)
+  ├── api/
+  │   ├── match.js       (initial match + chat)
+  │   └── compare.js     (car comparison specs)
+  ├── NEA.txt            (this document)
+  └── vercel.json        (if used for deployment)
+
+--------------------------------------------------------------------------------
+5. TESTING
+--------------------------------------------------------------------------------
+
+Manual testing performed:
+- Preferences form validation (min 3 chips)
+- Budget type (monthly vs full) passed to AI
+- Chat continuation with context
+- Car list extraction from various AI response formats
+- Compare flow: 4-14 cars, tournament elimination
+- Stat colouring (green better, red worse)
+- localStorage restore (Continue vs Start fresh)
+- Responsive layout on mobile
+
+Edge cases handled:
+- Empty or invalid API responses
+- Odd number of cars (bye advances automatically)
+- Long placeholder text in chat input
+
+--------------------------------------------------------------------------------
+6. EVALUATION
+--------------------------------------------------------------------------------
+
+Strengths:
+- Clear, focused user flow from preferences to final choice
+- AI provides personalised, contextual recommendations
+- Compare feature uses real specs (from AI) with visual feedback
+- Persistence allows users to return to conversations
+- No external dependencies on frontend (vanilla JS)
+
+Limitations:
+- AI-generated specs may not always match real-world data
+- No authentication; data stored only in browser
+- Requires Groq API key (server-side)
+
+Possible improvements:
+- Integrate real car database API for accurate specs
+- Add user accounts and cloud sync
+- Support image search or car photos
+
+--------------------------------------------------------------------------------
+7. REFERENCES
+--------------------------------------------------------------------------------
+
+- Groq API: https://console.groq.com/docs
+- Vercel Serverless: https://vercel.com/docs/functions
+- Llama 3.3: https://llama.meta.com/
+
+--------------------------------------------------------------------------------
+                              END OF NEA DOCUMENT
+================================================================================
