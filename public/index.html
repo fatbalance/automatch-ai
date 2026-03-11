@@ -222,6 +222,16 @@
       background:#141414;
       border:1px solid #252525;
       color:#e8e8e8;
+      overflow:hidden;
+    }
+    .chat-msg.assistant.expanding{
+      max-height:0;
+      opacity:1;
+      transform:none;
+      animation:expandMsg var(--expand-dur, 3s) ease forwards;
+    }
+    @keyframes expandMsg{
+      to{max-height:2000px}
     }
     .chat-msg.assistant pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit}
     .chat-msg.assistant .word{opacity:0;animation:wordIn .4s ease forwards}
@@ -645,6 +655,10 @@ Notes: ${n || "—"}`;
     return html || escapeHtml(text || "");
   }
 
+  function countWords(text) {
+    return (text || "").split(/\s+/).filter(Boolean).length;
+  }
+
   function appendChatMessage(role, content, opts = {}) {
     const animate = opts.animate !== false;
     const div = document.createElement("div");
@@ -652,6 +666,18 @@ Notes: ${n || "—"}`;
     div.innerHTML = role === "assistant"
       ? (animate ? formatReplyToHtml(content) : formatReplyToHtmlPlain(content))
       : formatReplyToHtmlPlain(content);
+    if (role === "assistant" && animate) {
+      const words = countWords(content);
+      const dur = Math.min(8, Math.max(1, words * 0.1));
+      div.classList.add("expanding");
+      div.style.setProperty("--expand-dur", `${dur}s`);
+      const scrollInterval = setInterval(scrollChatToBottom, 80);
+      div.addEventListener("animationend", () => {
+        div.classList.remove("expanding");
+        clearInterval(scrollInterval);
+        scrollChatToBottom();
+      });
+    }
     chatMessages.appendChild(div);
     scrollChatToBottom();
   }
