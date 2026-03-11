@@ -317,6 +317,22 @@
     }
     .chat-context-bar strong{color:#b8b8b8;font-weight:600}
 
+    .restore-banner{
+      display:none;
+      background:rgba(255,255,255,.05);
+      border:1px solid #2a2a2a;
+      border-radius:16px;
+      padding:18px 24px;
+      margin-bottom:24px;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .restore-banner.visible{display:flex}
+    .restore-banner p{margin:0;color:#c8c8c8;font-size:15px}
+    .restore-banner .btns{display:flex;gap:10px}
+
     .reply{
       border:1px solid #1f1f1f;
       background:#0e0e0e;
@@ -380,6 +396,14 @@
       Pick what applies. We’ll generate your first match, then drop you straight into chat to refine it.
     </p>
   </section>
+
+  <div id="restoreBanner" class="restore-banner">
+    <p>You have a saved conversation. Continue where you left off?</p>
+    <div class="btns">
+      <button class="btn" type="button" onclick="startFresh()">Start fresh</button>
+      <button class="btn primary" type="button" onclick="continueChat()">Continue</button>
+    </div>
+  </div>
 
   <section id="prefsView" class="layout prefs-view">
     <div class="panel">
@@ -482,6 +506,7 @@
   const errBoxChat = document.getElementById("errBoxChat");
   const matchErrBox = document.getElementById("matchErrBox");
   const chatContextBar = document.getElementById("chatContextBar");
+  const restoreBanner = document.getElementById("restoreBanner");
 
   const STORAGE_KEY = "automatch_chat";
   const PICK_TO_ID = {
@@ -689,6 +714,7 @@ Notes: ${n || "—"}`;
 
     prefsView.classList.add("hidden");
     chatView.classList.add("active");
+    restoreBanner.classList.remove("visible");
     chatMessages.innerHTML = "";
     appendChatMessage("assistant", initialReply);
     updateContextBar();
@@ -709,6 +735,7 @@ Notes: ${n || "—"}`;
     clearMatchError();
     clearChatError();
     chatContextBar.innerHTML = "";
+    if (hasSavedChat()) restoreBanner.classList.add("visible");
   }
 
   function buildInitialUserPrompt() {
@@ -733,6 +760,15 @@ Notes: ${n || "—"}`;
     renderText();
   }
 
+  function hasSavedChat() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const { chatHistory: h, chatContext: c } = JSON.parse(raw);
+      return !!(h && h.length && c);
+    } catch (_) { return false; }
+  }
+
   function restoreFromStorage() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -744,8 +780,8 @@ Notes: ${n || "—"}`;
       restoreFormFromContext(c);
       prefsView.classList.add("hidden");
       chatView.classList.add("active");
+      restoreBanner.classList.remove("visible");
       chatMessages.innerHTML = "";
-      // AI speaks first: show assistant messages, skip the initial user prefs (shown in context bar)
       let skipFirstUser = true;
       h.forEach(m => {
         if (m.role === "assistant") appendChatMessage("assistant", m.content, { animate: false });
@@ -758,6 +794,32 @@ Notes: ${n || "—"}`;
       chatInput.value = "";
       return true;
     } catch (_) { return false; }
+  }
+
+  function continueChat() {
+    restoreFromStorage();
+  }
+
+  function startFresh() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    restoreBanner.classList.remove("visible");
+    budget.value = "";
+    notes.value = "";
+    allChecks().forEach(c => c.checked = false);
+    renderText();
+  }
+
+  function initPage() {
+    if (hasSavedChat()) {
+      try {
+        const { chatContext: c } = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (c) restoreFormFromContext(c);
+      } catch (_) {}
+      restoreBanner.classList.add("visible");
+    } else {
+      restoreBanner.classList.remove("visible");
+    }
+    renderText();
   }
 
   function typewriter(el, fullText, { cps = 70 } = {}) {
@@ -925,7 +987,7 @@ Notes: ${n || "—"}`;
   budget.addEventListener("input", renderText);
   notes.addEventListener("input", renderText);
 
-  if (!restoreFromStorage()) renderText();
+  initPage();
 </script>
 
 </body>
