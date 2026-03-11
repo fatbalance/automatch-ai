@@ -203,9 +203,8 @@
     }
     .chat-msg-wrap.assistant{justify-content:flex-start}
     .chat-msg-wrap.user{justify-content:flex-end}
-    .chat-messages::-webkit-scrollbar{width:6px}
-    .chat-messages::-webkit-scrollbar-track{background:transparent}
-    .chat-messages::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
+    .chat-messages{scrollbar-width:none;-ms-overflow-style:none}
+    .chat-messages::-webkit-scrollbar{display:none}
     .chat-msg{
       display:inline-block;
       max-width:85%;
