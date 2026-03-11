@@ -217,6 +217,8 @@
       color:#e8e8e8;
     }
     .chat-msg.assistant pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit}
+    .chat-msg.assistant .word{opacity:0;animation:wordIn .4s ease forwards}
+    @keyframes wordIn{to{opacity:1}}
     .chat-msg .h{margin:12px 0 6px;font-weight:750;color:#f5f5f5}
     .chat-msg .h:first-child{margin-top:0}
     .chat-msg ul{margin:10px 0 14px 20px;padding:0}
@@ -512,6 +514,43 @@ Notes: ${n || "—"}`;
     const lines = (text || "").split("\n");
     let html = "";
     let inList = false;
+    let wordIndex = 0;
+    const closeList = () => { if (inList) { html += "</ul>"; inList = false; } };
+    const addWords = (t) => {
+      const words = t.split(/\s+/).filter(Boolean);
+      const out = words.map((w, i) =>
+        `<span class="word" style="animation-delay:${(wordIndex + i) * 0.1}s">${escapeHtml(w)}</span>`
+      ).join(" ");
+      wordIndex += words.length;
+      return out;
+    };
+    for (let raw of lines) {
+      const t = raw.trim();
+      if (!t) { closeList(); html += `<div style="height:10px"></div>`; continue; }
+      if (/^[-*•]\s+/.test(t)) {
+        if (!inList) { html += "<ul>"; inList = true; }
+        html += `<li>${addWords(t.replace(/^[-*•]\s+/, ""))}</li>`;
+        continue;
+      }
+      closeList();
+      if (/^\d+\.\s+/.test(t)) {
+        html += `<div class="h">${addWords(t)}</div>`;
+        continue;
+      }
+      if (t.length <= 48 && /:$/.test(t)) {
+        html += `<div class="h">${addWords(t.replace(/:$/, ""))}</div>`;
+        continue;
+      }
+      html += `<div>${addWords(t)}</div>`;
+    }
+    closeList();
+    return html || escapeHtml(text || "");
+  }
+
+  function formatReplyToHtmlPlain(text) {
+    const lines = (text || "").split("\n");
+    let html = "";
+    let inList = false;
     const closeList = () => { if (inList) { html += "</ul>"; inList = false; } };
     for (let raw of lines) {
       const t = raw.trim();
@@ -536,10 +575,13 @@ Notes: ${n || "—"}`;
     return html || escapeHtml(text || "");
   }
 
-  function appendChatMessage(role, content) {
+  function appendChatMessage(role, content, opts = {}) {
+    const animate = opts.animate !== false;
     const div = document.createElement("div");
     div.className = `chat-msg ${role}`;
-    div.innerHTML = formatReplyToHtml(content);
+    div.innerHTML = role === "assistant"
+      ? (animate ? formatReplyToHtml(content) : formatReplyToHtmlPlain(content))
+      : formatReplyToHtmlPlain(content);
     chatMessages.appendChild(div);
     scrollChatToBottom();
   }
@@ -661,7 +703,7 @@ Notes: ${n || "—"}`;
       // AI speaks first: show assistant messages, skip the initial user prefs (shown in context bar)
       let skipFirstUser = true;
       h.forEach(m => {
-        if (m.role === "assistant") appendChatMessage("assistant", m.content);
+        if (m.role === "assistant") appendChatMessage("assistant", m.content, { animate: false });
         else if (m.role === "user") {
           if (skipFirstUser) skipFirstUser = false;
           else appendChatMessage("user", m.content);
