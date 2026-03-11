@@ -25,10 +25,11 @@ export default async function handler(req, res) {
 
     if (chatMessages.length > 0) {
       const budget = (context.budget ?? "").toString().trim();
+      const budgetType = (context.budgetType ?? "").toString().trim();
       const picks = Array.isArray(context.picks) ? context.picks.map(String) : [];
       const notes = (context.notes ?? "").toString().trim();
       const contextBlurb = [
-        budget && `Budget: ${budget}`,
+        budget && `Budget: ${budget}${budgetType ? ` (${budgetType})` : ""}`,
         picks.length && `Preferences: ${picks.join(", ")}`,
         notes && `Notes: ${notes}`,
       ]
@@ -44,13 +45,16 @@ export default async function handler(req, res) {
         ...chatMessages.map((m) => ({ role: m.role, content: String(m.content || "").trim() })),
       ];
     } else {
-      // Initial request: budget, picks, notes
+      // Initial request: budget, budgetType, picks, notes
       const budget = (body.budget ?? "").toString().trim();
+      const budgetType = (body.budgetType ?? "").toString().trim();
       const picks = Array.isArray(body.picks) ? body.picks.map(String) : [];
       const notes = (body.notes ?? "").toString().trim();
 
       const userPrompt = [
-        `Budget: ${budget || "Not provided"}`,
+        `Budget: ${budget || "Not provided"}${budgetType ? ` (${budgetType})` : ""}`,
+        budgetType === "monthly" && "Interpret the budget as a monthly payment (e.g. finance/PCP).",
+        budgetType === "full" && "Interpret the budget as total purchase price.",
         `Preferences: ${picks.length ? picks.join(", ") : "None selected"}`,
         `Notes: ${notes || "None"}`,
         "",
@@ -69,7 +73,7 @@ export default async function handler(req, res) {
         "[Short paragraph]",
         "",
         "End with 1 short follow-up question. Keep it concise and practical.",
-      ].join("\n");
+      ].filter((x) => x !== false).join("\n");
 
       messages = [
         { role: "system", content: "You are a practical UK car advisor. Be concise, specific, and not salesy. When the user shares preferences, you always speak first with a warm opener before your recommendations." },
