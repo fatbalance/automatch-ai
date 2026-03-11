@@ -37,7 +37,9 @@ export default async function handler(req, res) {
         .join(". ");
 
       const systemContent =
-        "You are a practical UK car advisor. Be concise, specific, and not salesy." +
+        "You are a practical UK car advisor. Be concise, specific, and not salesy. " +
+        "When listing cars, use this format on one line per car: 1. **Car Name**: brief description. " +
+        "Only the car name goes in bold (between **); the description stays plain." +
         (contextBlurb ? ` The user's initial context: ${contextBlurb}` : "");
 
       messages = [
