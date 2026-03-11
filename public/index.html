@@ -176,15 +176,79 @@
     .results{margin-top:18px;display:none;animation:fadeIn .25s ease both}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* Chat view - ChatGPT-style layout, same dark theme */
+    /* Chat view - ChatGPT-style layout with car list sidebar */
     .chat-view{
       display:none;
       animation:fadeIn .3s ease both;
-      max-width:768px;
+      max-width:1200px;
       margin:0 auto;
       width:100%;
     }
     .chat-view.active{display:block}
+    .chat-layout{
+      display:grid;
+      grid-template-columns:1fr 280px;
+      gap:24px;
+      align-items:start;
+    }
+    .chat-main{min-width:0}
+    .car-list-sidebar{
+      position:sticky;
+      top:18px;
+      background:#101010;
+      border:1px solid #1f1f1f;
+      border-radius:22px;
+      padding:20px;
+    }
+    .car-list-sidebar h3{margin:0 0 8px;font-size:14px;color:#d6d6d6;font-weight:750}
+    .car-list-sidebar .hint{font-size:12px;color:#8a8a8a;margin-bottom:14px;line-height:1.4}
+    .car-list-sidebar .list{
+      max-height:320px;
+      overflow-y:auto;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .car-list-sidebar .list::-webkit-scrollbar{width:6px}
+    .car-list-sidebar .list::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:3px}
+    .car-list-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #1e1e1e;
+      background:#0b0b0b;
+      cursor:pointer;
+      transition:border-color .15s,background .15s;
+    }
+    .car-list-item:hover{border-color:#2a2a2a}
+    .car-list-item.selected{border-color:#e5e7eb;background:rgba(255,255,255,.06)}
+    .car-list-item input{display:none}
+    .car-list-item .tick{
+      width:18px;height:18px;border-radius:6px;border:1px solid #3a3a3a;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      font-size:11px;color:#0b0b0b;background:transparent;
+    }
+    .car-list-item.selected .tick{background:#e5e7eb;border-color:#e5e7eb}
+    .car-list-item span.name{flex:1;font-size:14px;color:#e6e6e6}
+    .car-list-item.selected span.name{color:#fff}
+    .car-list-sidebar .count{font-size:12px;color:#8a8a8a;margin-top:12px}
+    .car-list-sidebar .compare-btn{
+      margin-top:14px;
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      background:#fff;
+      color:#0b0b0b;
+      font-weight:700;
+      font-size:15px;
+      cursor:pointer;
+      transition:transform .12s,opacity .12s;
+    }
+    .car-list-sidebar .compare-btn:hover:not(:disabled){transform:translateY(-1px)}
+    .car-list-sidebar .compare-btn:disabled{opacity:.4;cursor:not-allowed}
     .prefs-view.hidden{display:none !important}
     .chat-messages{
       min-height:min(60vh, 500px);
@@ -387,9 +451,64 @@
       .hero{flex-direction:column;align-items:flex-start}
       .hero h1{font-size:44px}
     }
+    /* Tournament comparison view */
+    .tournament-view{
+      display:none;
+      animation:fadeIn .3s ease both;
+      max-width:900px;
+      margin:0 auto;
+      padding:0 24px 80px;
+    }
+    .tournament-view.active{display:block}
+    .tournament-view h2{margin:0 0 8px;font-size:24px;font-weight:750}
+    .tournament-view .sub{margin:0 0 24px;color:#9a9a9a;font-size:15px}
+    .tournament-round{
+      margin-bottom:32px;
+    }
+    .tournament-round h3{font-size:13px;color:#8a8a8a;text-transform:uppercase;letter-spacing:.08em;margin:0 0 16px}
+    .bracket-pair{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:16px;
+      padding:20px 24px;
+      background:#101010;
+      border:1px solid #1f1f1f;
+      border-radius:18px;
+    }
+    .bracket-pair .car-option{
+      flex:1;
+      padding:16px 20px;
+      border-radius:14px;
+      border:2px solid #2a2a2a;
+      background:#0b0b0b;
+      text-align:center;
+      font-size:17px;
+      font-weight:600;
+      color:#e6e6e6;
+      cursor:pointer;
+      transition:border-color .2s,background .2s,transform .12s;
+    }
+    .bracket-pair .car-option:hover{border-color:#4a4a4a;transform:scale(1.02)}
+    .bracket-pair .car-option.selected{border-color:#fff;background:rgba(255,255,255,.08);color:#fff}
+    .bracket-pair .vs{font-size:14px;color:#6a6a6a;font-weight:700}
+    .tournament-winner{
+      text-align:center;
+      padding:32px;
+      background:linear-gradient(135deg,#141414,#0b0b0b);
+      border:1px solid #2a2a2a;
+      border-radius:22px;
+      margin-top:24px;
+    }
+    .tournament-winner .label{font-size:12px;color:#8a8a8a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+    .tournament-winner .car-name{font-size:28px;font-weight:750;color:#fff}
+    .tournament-view .back-btn{margin-bottom:16px}
+
     @media (max-width:820px){
       .chat-view{max-width:100%;padding-left:16px;padding-right:16px}
       .chat-messages{min-height:50vh;max-height:60vh}
+      .chat-layout{grid-template-columns:1fr}
+      .car-list-sidebar{position:static;order:-1}
     }
   </style>
 </head>
@@ -496,16 +615,34 @@
   </section>
 
   <section id="chatView" class="chat-view panel">
-    <div class="back-btn" onclick="backToPrefs()">← Back to preferences</div>
-    <div id="chatContextBar" class="chat-context-bar"></div>
-    <h2>Chat with your car advisor</h2>
-    <p class="sub" id="chatSub">Discuss your options and get personalised advice.</p>
-    <div id="errBoxChat" class="error"></div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input-row">
-      <textarea id="chatInput" placeholder="Ask anything… compare cars, get more details, refine your search" rows="1"></textarea>
-      <button id="sendBtn" class="btn primary" type="button" onclick="sendChat()">Send</button>
+    <div class="chat-layout">
+      <div class="chat-main">
+        <div class="back-btn" onclick="backToPrefs()">← Back to preferences</div>
+        <div id="chatContextBar" class="chat-context-bar"></div>
+        <h2>Chat with your car advisor</h2>
+        <p class="sub" id="chatSub">Discuss your options and get personalised advice.</p>
+        <div id="errBoxChat" class="error"></div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <textarea id="chatInput" placeholder="Ask anything… compare cars, get more details, refine your search" rows="1"></textarea>
+          <button id="sendBtn" class="btn primary" type="button" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+      <aside class="car-list-sidebar">
+        <h3>Mentioned cars</h3>
+        <p class="hint">Tick cars you like. Pick 4–14 to compare.</p>
+        <div id="carList" class="list"></div>
+        <p id="carListCount" class="count">0 selected</p>
+        <button id="compareBtn" class="compare-btn" type="button" onclick="goToCompare()" disabled>Compare (need 4+)</button>
+      </aside>
     </div>
+  </section>
+
+  <section id="tournamentView" class="tournament-view">
+    <div class="back-btn" onclick="backFromTournament()">← Back to chat</div>
+    <h2>Car showdown</h2>
+    <p class="sub">Pick your favourite in each round. We'll crown a winner.</p>
+    <div id="tournamentContent"></div>
   </section>
 
 </main>
@@ -524,8 +661,17 @@
   const matchErrBox = document.getElementById("matchErrBox");
   const chatContextBar = document.getElementById("chatContextBar");
   const restoreOverlay = document.getElementById("restoreOverlay");
+  const carListEl = document.getElementById("carList");
+  const carListCountEl = document.getElementById("carListCount");
+  const compareBtn = document.getElementById("compareBtn");
+  const tournamentView = document.getElementById("tournamentView");
+  const tournamentContent = document.getElementById("tournamentContent");
 
   const STORAGE_KEY = "automatch_chat";
+  const MAX_SELECTED_CARS = 14;
+  const MIN_CARS_TO_COMPARE = 4;
+
+  let selectedCarNames = new Set();
   const PICK_TO_ID = {
     Hatchback: "t_hatch", SUV: "t_suv", Saloon: "t_saloon", Estate: "t_estate",
     Coupe: "t_coupe", Electric: "t_electric", Hybrid: "t_hybrid",
@@ -588,6 +734,64 @@ Notes: ${n || "—"}`;
     return String(s || "").replace(/[&<>"']/g, c => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     }[c]));
+  }
+
+  function extractCarsFromText(text) {
+    const cars = new Set();
+    const lines = (text || "").split("\n");
+    for (const line of lines) {
+      const m = line.match(/^\d+\.\s+(.+)/);
+      if (m) {
+        let name = m[1].replace(/\s+[–-]\s.*$/, "").trim();
+        if (name.length > 2) cars.add(name);
+      }
+    }
+    return cars;
+  }
+
+  function getAllMentionedCars() {
+    const cars = new Set();
+    for (const m of chatHistory) {
+      if (m.role === "assistant" && m.content) {
+        extractCarsFromText(m.content).forEach(c => cars.add(c));
+      }
+    }
+    return Array.from(cars).sort();
+  }
+
+  function updateCarList() {
+    const cars = getAllMentionedCars();
+    carListEl.innerHTML = "";
+    for (const name of cars) {
+      const item = document.createElement("label");
+      item.className = "car-list-item" + (selectedCarNames.has(name) ? " selected" : "");
+      item.innerHTML = `<span class="tick">${selectedCarNames.has(name) ? "✓" : ""}</span><span class="name">${escapeHtml(name)}</span>`;
+      item.dataset.car = name;
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = selectedCarNames.has(name);
+      input.dataset.car = name;
+      item.prepend(input);
+      item.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (selectedCarNames.has(name)) {
+          selectedCarNames.delete(name);
+        } else if (selectedCarNames.size < MAX_SELECTED_CARS) {
+          selectedCarNames.add(name);
+        }
+        updateCarList();
+        updateCompareButton();
+      });
+      carListEl.appendChild(item);
+    }
+    carListCountEl.textContent = `${selectedCarNames.size} selected`;
+    updateCompareButton();
+  }
+
+  function updateCompareButton() {
+    const n = selectedCarNames.size;
+    compareBtn.disabled = n < MIN_CARS_TO_COMPARE;
+    compareBtn.textContent = n >= MIN_CARS_TO_COMPARE ? `Compare ${n} cars` : `Compare (need ${MIN_CARS_TO_COMPARE}+)`;
   }
 
   function getStreamingWords(text) {
@@ -772,7 +976,7 @@ Notes: ${n || "—"}`;
     chatContext = { budget: budget.value.trim(), budgetType: getBudgetType(), picks: selected(), notes: notes.value.trim() };
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext, selectedCarNames: Array.from(selectedCarNames) }));
     } catch (_) {}
 
     prefsView.classList.add("hidden");
@@ -785,6 +989,84 @@ Notes: ${n || "—"}`;
     clearChatError();
     chatInput.value = "";
     chatInput.focus();
+    updateCarList();
+  }
+
+  function goToCompare() {
+    const cars = Array.from(selectedCarNames);
+    if (cars.length < MIN_CARS_TO_COMPARE) return;
+    chatView.classList.remove("active");
+    tournamentView.classList.add("active");
+    runTournament(cars);
+  }
+
+  function backFromTournament() {
+    tournamentView.classList.remove("active");
+    chatView.classList.add("active");
+  }
+
+  function pairUp(items) {
+    const pairs = [];
+    for (let i = 0; i < items.length; i += 2) {
+      pairs.push(i + 1 < items.length ? [items[i], items[i + 1]] : [items[i], null]);
+    }
+    return pairs;
+  }
+
+  function runTournament(cars) {
+    tournamentState = { current: cars.map(c => ({ name: c })), roundNum: 1 };
+    renderTournamentRound();
+  }
+
+  let tournamentState = null;
+
+  function renderTournamentRound() {
+    const { current, roundNum } = tournamentState;
+    if (current.length === 1) {
+      showTournamentWinner(current[0].name);
+      return;
+    }
+    const pairs = pairUp(current);
+    let html = `<div class="tournament-round"><h3>Round ${roundNum}</h3>`;
+    pairs.forEach((pair, i) => {
+      const [a, b] = pair;
+      if (!b) {
+        html += `<div class="bracket-pair" data-pair="${i}"><div class="car-option selected" data-winner="${i}" data-name="${escapeHtml(a.name)}">${escapeHtml(a.name)}</div><span class="vs">(bye)</span></div>`;
+        return;
+      }
+      html += `<div class="bracket-pair" data-pair="${i}">
+        <div class="car-option" data-winner="${i}" data-name="${escapeHtml(a.name)}">${escapeHtml(a.name)}</div>
+        <span class="vs">vs</span>
+        <div class="car-option" data-winner="${i}" data-name="${escapeHtml(b.name)}">${escapeHtml(b.name)}</div>
+      </div>`;
+    });
+    html += "</div>";
+    tournamentContent.innerHTML = html;
+
+    const winners = pairs.map((pair, i) => (pair[1] === null ? pair[0] : null));
+    tournamentContent.querySelectorAll(".car-option").forEach(el => {
+      const name = el.dataset.name;
+      if (!name) return;
+      const pairIdx = parseInt(el.dataset.winner, 10);
+      const pair = pairs[pairIdx];
+      if (pair[1] === null) return;
+      el.addEventListener("click", () => {
+        const winner = pair[0] && pair[0].name === name ? pair[0] : (pair[1] || pair[0]);
+        winners[pairIdx] = winner;
+        tournamentContent.querySelectorAll(`.bracket-pair[data-pair="${pairIdx}"] .car-option`).forEach(o => o.classList.remove("selected"));
+        el.classList.add("selected");
+        const allPicked = winners.every(w => w !== null);
+        if (allPicked) {
+          tournamentState.current = winners.filter(Boolean);
+          tournamentState.roundNum++;
+          setTimeout(() => renderTournamentRound(), 500);
+        }
+      });
+    });
+  }
+
+  function showTournamentWinner(name) {
+    tournamentContent.innerHTML = `<div class="tournament-winner"><div class="label">Your winner</div><div class="car-name">${escapeHtml(name)}</div></div>`;
   }
 
   function backToPrefs() {
@@ -792,6 +1074,7 @@ Notes: ${n || "—"}`;
     activeController = null;
     prefsView.classList.remove("hidden");
     chatView.classList.remove("active");
+    tournamentView.classList.remove("active");
     chatHistory = [];
     chatContext = {};
     chatMessages.innerHTML = "";
@@ -838,10 +1121,11 @@ Notes: ${n || "—"}`;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
-      const { chatHistory: h, chatContext: c } = JSON.parse(raw);
+      const { chatHistory: h, chatContext: c, selectedCarNames: s } = JSON.parse(raw);
       if (!h || !h.length || !c) return false;
       chatHistory = h;
       chatContext = c;
+      if (Array.isArray(s)) selectedCarNames = new Set(s);
       restoreFormFromContext(c);
       prefsView.classList.add("hidden");
       chatView.classList.add("active");
@@ -857,6 +1141,7 @@ Notes: ${n || "—"}`;
       });
       updateContextBar();
       chatInput.value = "";
+      updateCarList();
       return true;
     } catch (_) { return false; }
   }
@@ -1019,7 +1304,8 @@ Notes: ${n || "—"}`;
       const reply = data.reply || "No reply returned.";
       chatHistory.push({ role: "assistant", content: reply });
       appendChatMessage("assistant", reply);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext })); } catch (_) {}
+      updateCarList();
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext, selectedCarNames: Array.from(selectedCarNames) })); } catch (_) {}
     } catch (e) {
       hideTypingIndicator();
       if (e?.name !== "AbortError") showChatError(e?.message || String(e));
