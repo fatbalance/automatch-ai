@@ -508,6 +508,8 @@
     .compare-card .spec{font-size:14px;color:#b8b8b8;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px}
     .compare-card .spec span:first-child{color:#8a8a8a}
     .compare-card .spec span:last-child{color:#e0e0e0;text-align:right}
+    .compare-card .spec-val.stat-better{color:#5dd85d !important}
+    .compare-card .spec-val.stat-worse{color:#e87878 !important}
     .compare-card ul{margin:12px 0 0;padding:0;list-style:none;font-size:13px}
     .compare-card .pros li{color:#7dd87d;margin:4px 0}
     .compare-card .cons li{color:#e88a8a;margin:4px 0}
@@ -1150,17 +1152,45 @@ Notes: ${n || "—"}`;
     return pairs;
   }
 
-  function renderCarCard(car) {
+  function parseNum(s) { const m = String(s || "").replace(/,/g, "").match(/[\d.]+/); return m ? parseFloat(m[0]) : null; }
+  function parseInsurance(s) { const m = String(s || "").match(/group\s*(\d+)/i) || String(s).match(/(\d+)/); return m ? parseInt(m[1], 10) : parseNum(s); }
+  const RELIABILITY_ORDER = ["poor","fair","average","good","excellent"];
+  function parseReliability(s) { const v = String(s || "").toLowerCase(); return RELIABILITY_ORDER.findIndex(r => v.includes(r)); }
+
+  function compareStat(key, valA, valB) {
+    if (!valA && !valB) return [null, null];
+    const a = valA, b = valB;
+    if (key === "price") { const nA = parseNum(a), nB = parseNum(b); if (nA == null || nB == null) return [null, null]; return nA < nB ? ["better", "worse"] : nA > nB ? ["worse", "better"] : [null, null]; }
+    if (key === "mpg") { const nA = parseNum(a), nB = parseNum(b); if (nA == null || nB == null) return [null, null]; return nA > nB ? ["better", "worse"] : nA < nB ? ["worse", "better"] : [null, null]; }
+    if (key === "insurance") { const nA = parseInsurance(a), nB = parseInsurance(b); if (nA == null || nB == null) return [null, null]; return nA < nB ? ["better", "worse"] : nA > nB ? ["worse", "better"] : [null, null]; }
+    if (key === "boot") { const nA = parseNum(a), nB = parseNum(b); if (nA == null || nB == null) return [null, null]; return nA > nB ? ["better", "worse"] : nA < nB ? ["worse", "better"] : [null, null]; }
+    if (key === "reliability") { const nA = parseReliability(a), nB = parseReliability(b); if (nA < 0 && nB < 0) return [null, null]; const sA = nA >= 0 ? nA : -1, sB = nB >= 0 ? nB : -1; return sA > sB ? ["better", "worse"] : sA < sB ? ["worse", "better"] : [null, null]; }
+    return [null, null];
+  }
+
+  function renderCarCard(car, otherCar) {
     if (!car) return "";
+    const specs = [
+      { key: "price", label: "Price", val: car.price },
+      { key: "mpg", label: "MPG", val: car.mpg },
+      { key: "insurance", label: "Insurance", val: car.insurance },
+      { key: "boot", label: "Boot", val: car.boot },
+      { key: "reliability", label: "Reliability", val: car.reliability },
+    ];
     const pros = Array.isArray(car.pros) ? car.pros : [];
     const cons = Array.isArray(car.cons) ? car.cons : [];
     let html = `<div class="compare-card" data-name="${escapeHtml(car.name || "")}">
-      <div class="car-name">${escapeHtml(car.name || "—")}</div>
-      <div class="spec"><span>Price</span><span>${escapeHtml(String(car.price || "—"))}</span></div>
-      <div class="spec"><span>MPG</span><span>${escapeHtml(String(car.mpg || "—"))}</span></div>
-      <div class="spec"><span>Insurance</span><span>${escapeHtml(String(car.insurance || "—"))}</span></div>
-      <div class="spec"><span>Boot</span><span>${escapeHtml(String(car.boot || "—"))}</span></div>
-      <div class="spec"><span>Reliability</span><span>${escapeHtml(String(car.reliability || "—"))}</span></div>`;
+      <div class="car-name">${escapeHtml(car.name || "—")}</div>`;
+    specs.forEach(({ key, label, val }) => {
+      let cls = "";
+      if (otherCar) {
+        const [resA, resB] = compareStat(key, val, otherCar[key]);
+        const res = resA;
+        if (res === "better") cls = " stat-better";
+        else if (res === "worse") cls = " stat-worse";
+      }
+      html += `<div class="spec"><span>${escapeHtml(label)}</span><span class="spec-val${cls}">${escapeHtml(String(val || "—"))}</span></div>`;
+    });
     if (pros.length) html += `<ul class="pros">${pros.map(p => `<li>${escapeHtml(String(p))}</li>`).join("")}</ul>`;
     if (cons.length) html += `<ul class="cons">${cons.map(x => `<li>${escapeHtml(String(x))}</li>`).join("")}</ul>`;
     html += "</div>";
@@ -1192,8 +1222,8 @@ Notes: ${n || "—"}`;
       html += renderCarCard(a);
       html += `<div class="compare-card" style="cursor:default;opacity:.7"><div class="car-name">Bye</div><p style="color:#8a8a8a;margin:0">Advances automatically</p></div>`;
     } else {
-      html += renderCarCard(a);
-      html += renderCarCard(b);
+      html += renderCarCard(a, b);
+      html += renderCarCard(b, a);
     }
     html += "</div>";
     compareContent.innerHTML = html;
