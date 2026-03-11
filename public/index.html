@@ -228,6 +228,20 @@
     @keyframes wordIn{to{opacity:1}}
     .chat-msg .h{margin:12px 0 6px;font-weight:750;color:#f5f5f5}
     .chat-msg .h:first-child{margin-top:0}
+    .chat-msg .car-title{
+      margin:20px 0 8px;
+      font-size:18px;
+      font-weight:750;
+      color:#fff;
+      letter-spacing:-.02em;
+    }
+    .chat-msg .car-title:first-child{margin-top:0}
+    .chat-msg .car-desc{
+      margin:0 0 4px;
+      font-size:14px;
+      line-height:1.6;
+      color:#b8b8b8;
+    }
     .chat-msg ul{margin:10px 0 14px 20px;padding:0;list-style:none}
     .chat-msg li{margin:6px 0;color:#d8d8d8;padding-left:0}
     .typing-indicator{
@@ -531,6 +545,7 @@ Notes: ${n || "—"}`;
     const lines = (text || "").split("\n");
     let html = "";
     let inList = false;
+    let inCarDesc = false;
     let wordIndex = 0;
     const closeList = () => { if (inList) { html += "</ul>"; inList = false; } };
     const addWords = (t) => {
@@ -543,15 +558,21 @@ Notes: ${n || "—"}`;
     };
     for (let raw of lines) {
       const t = raw.trim();
-      if (!t) { closeList(); html += `<div style="height:10px"></div>`; continue; }
+      if (!t) { closeList(); inCarDesc = false; html += `<div style="height:10px"></div>`; continue; }
       if (/^[-*•]\s+/.test(t)) {
+        inCarDesc = false;
         if (!inList) { html += "<ul>"; inList = true; }
         html += `<li>${addWords("• " + t.replace(/^[-*•]\s+/, ""))}</li>`;
         continue;
       }
       closeList();
       if (/^\d+\.\s+/.test(t)) {
-        html += `<div class="h">${addWords(t)}</div>`;
+        inCarDesc = true;
+        html += `<div class="car-title">${addWords(t)}</div>`;
+        continue;
+      }
+      if (inCarDesc) {
+        html += `<div class="car-desc">${addWords(t)}</div>`;
         continue;
       }
       if (t.length <= 48 && /:$/.test(t)) {
@@ -568,18 +589,25 @@ Notes: ${n || "—"}`;
     const lines = (text || "").split("\n");
     let html = "";
     let inList = false;
+    let inCarDesc = false;
     const closeList = () => { if (inList) { html += "</ul>"; inList = false; } };
     for (let raw of lines) {
       const t = raw.trim();
-      if (!t) { closeList(); html += `<div style="height:10px"></div>`; continue; }
+      if (!t) { closeList(); inCarDesc = false; html += `<div style="height:10px"></div>`; continue; }
       if (/^[-*•]\s+/.test(t)) {
+        inCarDesc = false;
         if (!inList) { html += "<ul>"; inList = true; }
         html += `<li>${escapeHtml(t.replace(/^[-*•]\s+/, ""))}</li>`;
         continue;
       }
       closeList();
       if (/^\d+\.\s+/.test(t)) {
-        html += `<div class="h">${escapeHtml(t)}</div>`;
+        inCarDesc = true;
+        html += `<div class="car-title">${escapeHtml(t)}</div>`;
+        continue;
+      }
+      if (inCarDesc) {
+        html += `<div class="car-desc">${escapeHtml(t)}</div>`;
         continue;
       }
       if (t.length <= 48 && /:$/.test(t)) {
