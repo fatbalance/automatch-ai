@@ -102,12 +102,12 @@
       transition:background .12s ease,border-color .12s ease,color .12s ease;
     }
 
-    input[type="checkbox"]{display:none}
-    input[type="checkbox"]:checked + label.chip{
+    input[type="checkbox"],input[type="radio"]{display:none}
+    input[type="checkbox"]:checked + label.chip,input[type="radio"]:checked + label.chip{
       border-color:#e5e7eb;
       background:rgba(255,255,255,.06);
     }
-    input[type="checkbox"]:checked + label.chip .tick{
+    input[type="checkbox"]:checked + label.chip .tick,input[type="radio"]:checked + label.chip .tick{
       background:#e5e7eb;border-color:#e5e7eb;color:#0b0b0b;
     }
 
@@ -424,9 +424,13 @@
       <p class="sub">Multi-select on everything. The more you pick, the better the match.</p>
 
       <div class="q">
-        <div class="qtitle"><b>Budget</b><span>cash or monthly is fine</span></div>
+        <div class="qtitle"><b>Budget</b><span>helps the AI narrow down options</span></div>
+        <div class="row" style="margin-bottom:12px">
+          <input id="b_monthly" type="radio" name="budgetType" value="monthly"><label class="chip" for="b_monthly"><span class="tick">✓</span>Monthly</label>
+          <input id="b_full" type="radio" name="budgetType" value="full"><label class="chip" for="b_full"><span class="tick">✓</span>Full cost</label>
+        </div>
         <div class="money">
-          <input id="budget" placeholder="£12,000 or £350 / mo" />
+          <input id="budget" placeholder="e.g. £350 or £12,000" />
           <small>Optional</small>
         </div>
       </div>
@@ -539,13 +543,20 @@
   let chatHistory = [];
   let chatContext = {};
 
+  function getBudgetType() {
+    const r = document.querySelector('input[name="budgetType"]:checked');
+    return r ? r.value : "";
+  }
+
   function renderText() {
     const picks = selected();
     const b = budget.value?.trim();
+    const bt = getBudgetType();
     const n = notes.value?.trim();
 
+    const btLabel = bt === "monthly" ? "Monthly" : bt === "full" ? "Full cost" : bt;
     out.textContent =
-`Budget: ${b || "—"}
+`Budget: ${b || "—"}${btLabel ? ` (${btLabel})` : ""}
 Selected (${picks.length}):
 ${picks.length ? "- " + picks.join("\n- ") : "—"}
 
@@ -724,7 +735,10 @@ Notes: ${n || "—"}`;
   function updateContextBar() {
     const c = chatContext;
     const parts = [];
-    if (c.budget) parts.push(`<strong>Budget:</strong> ${escapeHtml(c.budget)}`);
+    if (c.budget) {
+      const btLabel = c.budgetType === "monthly" ? "Monthly" : c.budgetType === "full" ? "Full cost" : c.budgetType;
+      parts.push(`<strong>Budget:</strong> ${escapeHtml(c.budget)}${btLabel ? ` (${escapeHtml(btLabel)})` : ""}`);
+    }
     if (c.picks && c.picks.length) parts.push(`<strong>Preferences:</strong> ${escapeHtml(c.picks.join(", "))}`);
     if (c.notes) parts.push(`<strong>Notes:</strong> ${escapeHtml(c.notes)}`);
     chatContextBar.innerHTML = parts.length ? parts.join(" · ") : "";
@@ -734,6 +748,10 @@ Notes: ${n || "—"}`;
   function restoreFormFromContext(ctx) {
     if (!ctx) return;
     budget.value = ctx.budget || "";
+    if (ctx.budgetType) {
+      const r = document.querySelector(`input[name="budgetType"][value="${ctx.budgetType}"]`);
+      if (r) r.checked = true;
+    } else document.querySelectorAll('input[name="budgetType"]').forEach(el => el.checked = false);
     notes.value = ctx.notes || "";
     allChecks().forEach(c => { c.checked = false; });
     (ctx.picks || []).forEach(p => {
@@ -751,7 +769,7 @@ Notes: ${n || "—"}`;
       { role: "user", content: buildInitialUserPrompt() },
       { role: "assistant", content: initialReply },
     ];
-    chatContext = { budget: budget.value.trim(), picks: selected(), notes: notes.value.trim() };
+    chatContext = { budget: budget.value.trim(), budgetType: getBudgetType(), picks: selected(), notes: notes.value.trim() };
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext }));
@@ -785,8 +803,9 @@ Notes: ${n || "—"}`;
 
   function buildInitialUserPrompt() {
     const picks = selected();
+    const bt = getBudgetType();
     return [
-      `Budget: ${budget.value?.trim() || "Not provided"}`,
+      `Budget: ${budget.value?.trim() || "Not provided"}${bt ? ` (${bt})` : ""}`,
       `Preferences: ${picks.length ? picks.join(", ") : "None"}`,
       `Notes: ${notes.value?.trim() || "None"}`,
     ].join("\n");
@@ -798,6 +817,7 @@ Notes: ${n || "—"}`;
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
     backToPrefs();
     budget.value = "";
+    document.querySelectorAll('input[name="budgetType"]').forEach(el => el.checked = false);
     notes.value = "";
     allChecks().forEach(c => c.checked = false);
     matchBtn.disabled = false;
@@ -923,6 +943,7 @@ Notes: ${n || "—"}`;
     try {
       const payload = {
         budget: budget.value.trim(),
+        budgetType: getBudgetType(),
         picks,
         notes: notes.value.trim()
       };
@@ -1027,7 +1048,7 @@ Notes: ${n || "—"}`;
   });
 
   document.addEventListener("change", (e) => {
-    if (e.target.matches('input[type="checkbox"]')) renderText();
+    if (e.target.matches('input[type="checkbox"]') || e.target.matches('input[name="budgetType"]')) renderText();
   });
   budget.addEventListener("input", renderText);
   notes.addEventListener("input", renderText);
