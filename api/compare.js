@@ -1,8 +1,3 @@
-/**
- * POST /api/compare — asks Groq for JSON comparing 2+ car names (UK-oriented fields).
- * Body: { cars: string[], context?: { budget, budgetType, picks } }
- * Response: { cars: [ { name, price, mpg, ... } ] } parsed from model JSON.
- */
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed. Use POST." });
@@ -44,7 +39,6 @@ Given a list of cars, provide a side-by-side comparison with real UK market data
     ];
     const userPrompt = lines.filter(Boolean).join("\n");
 
-    // same OpenAI-compatible endpoint as match.js
     const resGroq = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
