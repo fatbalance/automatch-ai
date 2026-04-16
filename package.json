@@ -4,6 +4,8 @@
   "description": "UK car prefs UI + Groq-backed chat/compare on Vercel",
   "main": "index.js",
   "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,5 +14,8 @@
   "type": "commonjs",
   "dependencies": {
     "openai": "^6.16.0"
+  },
+  "devDependencies": {
+    "vercel": "^51.5.1"
   }
 }
