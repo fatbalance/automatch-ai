@@ -1,3 +1,8 @@
+/**
+ * POST /api/compare — asks Groq for JSON comparing 2+ car names (UK-oriented fields).
+ * Body: { cars: string[], context?: { budget, budgetType, picks } }
+ * Response: { cars: [ { name, price, mpg, ... } ] } parsed from model JSON.
+ */
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed. Use POST." });

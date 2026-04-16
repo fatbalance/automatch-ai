@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- AutoMatch: single-page UI + embedded CSS/JS (OCR A-Level NEA — H446) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -745,7 +746,17 @@
 <footer class="site-foot">Figures are indicative for the UK market—always confirm price, spec, and running costs before you buy.</footer>
 
 <script>
-  // --- refs
+  /*
+   * AutoMatch — browser script (NEA artefact)
+   *
+   * Data flow:
+   *   1) Preferences → POST /api/match → first assistant reply → chat view
+   *   2) Further messages → POST /api/match with { messages, context }
+   *   3) Compare → POST /api/compare → JSON specs → tournament until one winner
+   *
+   * State: chatHistory + chatContext saved under STORAGE_KEY (localStorage).
+   * Car names for the shortlist: regex extraction from assistant text (see extractCarsFromText).
+   */
   const out = document.getElementById("out");
   const budget = document.getElementById("budget");
   const notes = document.getElementById("notes");
@@ -772,7 +783,7 @@
 
   let selectedCarNames = new Set();
 
-  // checkbox label text -> element id (for restoring saved session)
+  // Maps saved preference strings back to checkbox ids when restoring a session
   const PICK_TO_ID = {
     Hatchback: "t_hatch", SUV: "t_suv", Saloon: "t_saloon", Estate: "t_estate",
     Coupe: "t_coupe", Electric: "t_electric", Hybrid: "t_hybrid",
@@ -841,7 +852,7 @@ Notes: ${n || "—"}`;
     return String(s || "").replace(/[&<>"']/g, (ch) => HTML_ESC[ch]);
   }
 
-  /** pull a display name from a model line (bold or numbered) */
+  // Strip noise from a line so we can match sidebar entries to free text
   function extractCarNameOnly(raw) {
     if (!raw || typeof raw !== "string") return "";
     let s = raw.trim();
@@ -884,7 +895,6 @@ Notes: ${n || "—"}`;
 
   let prevCarList = [];
 
-  // shortlist ticks — rebuilt whenever chat changes
   function updateCarList() {
     const cars = getAllMentionedCars();
     const newNames = new Set(cars.filter(c => !prevCarList.includes(c)));
@@ -922,7 +932,7 @@ Notes: ${n || "—"}`;
     compareBtn.textContent = n >= MIN_CARS_TO_COMPARE ? `Compare ${n} cars` : `Compare (need ${MIN_CARS_TO_COMPARE}+)`;
   }
 
-  // not full markdown; just the patterns we ask the model to use
+  // Display formatting only (not a full markdown parser — matches prompts in match.js)
   function formatReplyToHtmlPlain(text) {
     const lines = (text || "").split("\n");
     let html = "";
@@ -1117,6 +1127,7 @@ Notes: ${n || "—"}`;
     }
   }
 
+  // Adjacent pairs for head-to-head; if odd count, last pair is [car, null] (bye)
   function pairUpCars(items) {
     const pairs = [];
     for (let i = 0; i < items.length; i += 2) {
@@ -1143,7 +1154,7 @@ Notes: ${n || "—"}`;
     return RELIABILITY_ORDER.findIndex((r) => v.includes(r));
   }
 
-  /** which side wins for green/red — "better" / "worse" / null */
+  // For two numeric/text specs: which is "better" for the user (lower price, higher mpg, etc.)
   function compareStat(key, valA, valB) {
     if (!valA && !valB) return [null, null];
     const a = valA;
@@ -1223,7 +1234,7 @@ Notes: ${n || "—"}`;
     return html;
   }
 
-  // knockout rounds — compareState holds mutable bracket
+  // Tournament UI: each round pairs cars; user picks winner; repeats until one car (see NEA design)
   function renderCompareRound() {
     const { cars, roundNum, pairIdx } = compareState;
     if (cars.length === 1) {

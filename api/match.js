@@ -1,4 +1,12 @@
-// Vercel serverless — Groq chat for /api/match
+/**
+ * POST /api/match — Groq LLM (server-side key only; never exposed to browser).
+ *
+ * Two modes:
+ *   - Initial: body { budget, budgetType, picks, notes } → builds first user message.
+ *   - Chat: body { messages, context } → continues conversation with same context in system prompt.
+ *
+ * Response: { reply: string } or error JSON.
+ */
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 export default async function handler(req, res) {
