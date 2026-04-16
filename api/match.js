@@ -1,132 +1,33 @@
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed. Use POST." });
-  }
-
-  try {
-    const body = req.body || {};
-
-    if (!process.env.GROQ_API_KEY) {
-      return res.status(500).json({
-        error: "Missing GROQ_API_KEY",
-        hint: "Set GROQ_API_KEY in Vercel → Settings → Environment Variables (Production), then redeploy.",
-      });
-    }
-
-    const model = "llama-3.3-70b-versatile";
-    let messages;
-
-    const chatMessages = Array.isArray(body.messages) ? body.messages : [];
-    const context = body.context || {};
-
-    if (chatMessages.length > 0) {
-      const budget = (context.budget ?? "").toString().trim();
-      const budgetType = (context.budgetType ?? "").toString().trim();
-      const picks = Array.isArray(context.picks) ? context.picks.map(String) : [];
-      const notes = (context.notes ?? "").toString().trim();
-
-      const bits = [
-        budget && `Budget: ${budget}${budgetType ? ` (${budgetType})` : ""}`,
-        picks.length && `Preferences: ${picks.join(", ")}`,
-        notes && `Notes: ${notes}`,
-      ].filter(Boolean);
-      const contextBlurb = bits.join(". ");
-
-      const systemContent =
-        "You are a practical UK car advisor. Be concise, specific, and not salesy. " +
-        "When listing cars, use this format on one line per car: 1. **Car Name**: brief description. " +
-        "Only the car name goes in bold (between **); the description stays plain." +
-        (contextBlurb ? ` The user's initial context: ${contextBlurb}` : "");
-
-      messages = [
-        { role: "system", content: systemContent },
-        ...chatMessages.map((m) => ({
-          role: m.role,
-          content: String(m.content || "").trim(),
-        })),
-      ];
-    } else {
-      const budget = (body.budget ?? "").toString().trim();
-      const budgetType = (body.budgetType ?? "").toString().trim();
-      const picks = Array.isArray(body.picks) ? body.picks.map(String) : [];
-      const notes = (body.notes ?? "").toString().trim();
-
-      const userPrompt = [
-        `Budget: ${budget || "Not provided"}${budgetType ? ` (${budgetType})` : ""}`,
-        budgetType === "monthly" && "Interpret the budget as a monthly payment (e.g. finance/PCP).",
-        budgetType === "full" && "Interpret the budget as total purchase price.",
-        `Preferences: ${picks.length ? picks.join(", ") : "None selected"}`,
-        `Notes: ${notes || "None"}`,
-        "",
-        "Task:",
-        "The user has just shared their preferences. You speak first.",
-        "Open with a brief friendly greeting (1 sentence), then recommend 3 cars that suit them in the UK market.",
-        "",
-        "Format each car like this:",
-        "1. [Car name – e.g. Honda Civic, Volkswagen Golf]",
-        "[Short paragraph, 2–3 sentences, explaining why it suits them]",
-        "",
-        "2. [Car name]",
-        "[Short paragraph]",
-        "",
-        "3. [Car name]",
-        "[Short paragraph]",
-        "",
-        "End with 1 short follow-up question. Keep it concise and practical.",
-      ]
-        .filter((x) => x !== false)
-        .join("\n");
-
-      messages = [
-        {
-          role: "system",
-          content:
-            "You are a practical UK car advisor. Be concise, specific, and not salesy. When the user shares preferences, you always speak first with a warm opener before your recommendations.",
-        },
-        { role: "user", content: userPrompt },
-      ];
-    }
-
-    const response = await fetch(GROQ_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.7,
-        messages,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: "Groq request failed",
-        status: response.status,
-        details: data,
-        hint:
-          "If the error mentions a model, change model id to a supported one (e.g. llama-3.3-70b-versatile or llama-3.1-8b-instant).",
-      });
-    }
-
-    const reply = data?.choices?.[0]?.message?.content;
-    if (!reply) {
-      return res.status(500).json({
-        error: "No reply returned from model",
-        details: data,
-      });
-    }
-
-    return res.status(200).json({ reply });
-  } catch (err) {
-    return res.status(500).json({
-      error: "Server error",
-      details: err?.message || String(err),
-    });
-  }
+const GROQ_URL="https://api.groq.com/openai/v1/chat/completions";
+export default async function handler(req,res){
+if(req.method!=="POST")return res.status(405).json({error:"Method not allowed. Use POST."});
+try{
+const body=req.body||{};
+if(!process.env.GROQ_API_KEY)return res.status(500).json({error:"Missing GROQ_API_KEY",hint:"Set GROQ_API_KEY in Vercel env, redeploy."});
+const model="llama-3.3-70b-versatile";
+let messages;
+const chatMessages=Array.isArray(body.messages)?body.messages:[];
+const context=body.context||{};
+if(chatMessages.length>0){
+const budget=(context.budget??"").toString().trim(),budgetType=(context.budgetType??"").toString().trim();
+const picks=Array.isArray(context.picks)?context.picks.map(String):[],notes=(context.notes??"").toString().trim();
+const bits=[budget&&`Budget: ${budget}${budgetType?` (${budgetType})`:""}`,picks.length&&`Preferences: ${picks.join(", ")}`,notes&&`Notes: ${notes}`].filter(Boolean);
+const contextBlurb=bits.join(". ");
+const systemContent="You are a practical UK car advisor. Be concise, specific, and not salesy. When listing cars, use this format on one line per car: 1. **Car Name**: brief description. Only the car name goes in bold (between **); the description stays plain."+(contextBlurb?` The user's initial context: ${contextBlurb}`:"");
+messages=[{role:"system",content:systemContent},...chatMessages.map(m=>({role:m.role,content:String(m.content||"").trim()}))];
+}else{
+const budget=(body.budget??"").toString().trim(),budgetType=(body.budgetType??"").toString().trim();
+const picks=Array.isArray(body.picks)?body.picks.map(String):[],notes=(body.notes??"").toString().trim();
+const userPrompt=[`Budget: ${budget||"Not provided"}${budgetType?` (${budgetType})`:""}`,budgetType==="monthly"&&"Interpret the budget as a monthly payment (e.g. finance/PCP).",budgetType==="full"&&"Interpret the budget as total purchase price.",`Preferences: ${picks.length?picks.join(", "):"None selected"}`,`Notes: ${notes||"None"}`,"","Task:","The user has just shared their preferences. You speak first.","Open with a brief friendly greeting (1 sentence), then recommend 3 cars that suit them in the UK market.","","Format each car like this:","1. [Car name – e.g. Honda Civic, Volkswagen Golf]","[Short paragraph, 2–3 sentences, explaining why it suits them]","","2. [Car name]","[Short paragraph]","","3. [Car name]","[Short paragraph]","","End with 1 short follow-up question. Keep it concise and practical."].filter(x=>x!==false).join("\n");
+messages=[{role:"system",content:"You are a practical UK car advisor. Be concise, specific, and not salesy. When the user shares preferences, you always speak first with a warm opener before your recommendations."},{role:"user",content:userPrompt}];
+}
+const response=await fetch(GROQ_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${process.env.GROQ_API_KEY}`},body:JSON.stringify({model,temperature:0.7,messages})});
+const data=await response.json();
+if(!response.ok)return res.status(response.status).json({error:"Groq request failed",status:response.status,details:data,hint:"If model error, try llama-3.3-70b-versatile or llama-3.1-8b-instant."});
+const reply=data?.choices?.[0]?.message?.content;
+if(!reply)return res.status(500).json({error:"No reply returned from model",details:data});
+return res.status(200).json({reply});
+}catch(err){
+return res.status(500).json({error:"Server error",details:err?.message||String(err)});
+}
 }

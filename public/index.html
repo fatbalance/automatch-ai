@@ -26,7 +26,6 @@
       --ok:#1f6b4a;
       --bad:#b33a3a;
     }
-
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -37,7 +36,6 @@
       line-height:1.5;
       -webkit-font-smoothing:antialiased;
     }
-
     header{
       padding:22px 40px;
       border-bottom:1px solid var(--line);
@@ -59,13 +57,11 @@
     }
     .brand-tag{font-family:"Source Sans 3",sans-serif;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
     .hint{color:var(--muted);font-size:13px}
-
     main{
       max-width:1100px;
       margin:0 auto;
       padding:56px 30px 100px;
     }
-
     .hero{
       display:flex;
       align-items:flex-end;
@@ -89,14 +85,12 @@
       font-size:1.05rem;
       line-height:1.65;
     }
-
     .layout{
       display:grid;
       grid-template-columns:1.35fr .65fr;
       gap:22px;
       margin-top:8px;
     }
-
     .panel{
       background:var(--surface);
       border:1px solid var(--line);
@@ -112,15 +106,12 @@
       letter-spacing:-.02em;
     }
     .panel .sub{margin:0 0 22px;color:var(--muted);font-size:15px;line-height:1.55}
-
     .q{padding:20px 0;border-top:1px solid var(--line)}
     .q:first-of-type{border-top:0;padding-top:0}
     .qtitle{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
     .qtitle b{font-size:14px;color:var(--ink);font-weight:600}
     .qtitle span{font-size:12px;color:var(--muted)}
-
     .row{display:flex;gap:10px;flex-wrap:wrap}
-
     .chip{
       border:1px solid var(--line-strong);
       background:var(--surface-2);
@@ -137,7 +128,6 @@
     }
     .chip:hover{border-color:var(--muted);background:var(--surface)}
     .chip:active{opacity:.92}
-
     .tick{
       width:15px;height:15px;border-radius:4px;
       border:1px solid var(--line-strong);
@@ -145,7 +135,6 @@
       font-size:10px;color:transparent;background:var(--surface);
       transition:background .12s ease,border-color .12s ease,color .12s ease;
     }
-
     input[type="checkbox"],input[type="radio"]{display:none}
     input[type="checkbox"]:checked + label.chip,input[type="radio"]:checked + label.chip{
       border-color:var(--accent);
@@ -155,7 +144,6 @@
     input[type="checkbox"]:checked + label.chip .tick,input[type="radio"]:checked + label.chip .tick{
       background:var(--accent);border-color:var(--accent);color:#fff;
     }
-
     .money{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     .money input{
       width:320px;
@@ -169,7 +157,6 @@
     }
     .money input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
     .money small{color:var(--muted);font-size:12px}
-
     textarea{
       width:100%;
       padding:13px 14px;
@@ -183,7 +170,6 @@
       font-family:inherit;
     }
     textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-
     .actions{
       margin-top:18px;
       display:flex;
@@ -212,7 +198,6 @@
     .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
     .btn.primary:hover{background:#154030;border-color:#154030}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
     .summary{position:sticky;top:18px;height:fit-content}
     .summary .box{
       background:var(--surface-2);
@@ -223,10 +208,8 @@
     .summary h3{margin:0 0 6px;font-size:13px;color:var(--ink);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
     .summary .meta{color:var(--muted);font-size:12px;margin-bottom:10px;line-height:1.45}
     .summary pre{margin:0;white-space:pre-wrap;color:var(--muted);font-size:13px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-
     .results{margin-top:18px;display:none;animation:fadeIn .22s ease both}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
     .chat-view{
       display:none;
       animation:fadeIn .28s ease both;
@@ -455,7 +438,6 @@
       line-height:1.5;
     }
     .chat-context-bar strong{color:var(--ink);font-weight:600}
-
     .restore-overlay{
       display:none;
       position:fixed;
@@ -480,7 +462,6 @@
     }
     .restore-modal p{margin:0 0 22px;color:var(--ink);font-size:17px;line-height:1.5;font-family:"Newsreader",Georgia,serif}
     .restore-modal .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-
     .reply{
       border:1px solid var(--line);
       background:var(--surface-2);
@@ -492,7 +473,6 @@
       overflow-wrap:anywhere;
     }
     .reply pre{margin:0;white-space:pre-wrap;font:inherit;color:inherit;line-height:1.7}
-
     .error{
       border:1px solid var(--warn-border);
       background:var(--warn-bg);
@@ -505,12 +485,10 @@
       margin-bottom:12px;
       display:none;
     }
-
     .loader{color:var(--muted);font-size:14px}
     .loader .dots span{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--muted);margin:0 2px;animation:typingBounce 1s infinite}
     .loader .dots span:nth-child(2){animation-delay:.15s}
     .loader .dots span:nth-child(3){animation-delay:.3s}
-
     @media (max-width:900px){
       main{padding:40px 18px 80px}
       .layout{grid-template-columns:1fr}
@@ -584,7 +562,6 @@
     .compare-winner .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;font-weight:600}
     .compare-winner .car-name{font-family:"Newsreader",Georgia,serif;font-size:1.75rem;font-weight:600;color:var(--ink)}
     .compare-view .back-btn{margin-bottom:14px}
-
     @media (max-width:820px){
       .chat-view{max-width:100%;padding-left:18px;padding-right:18px}
       .chat-messages{min-height:46vh;max-height:58vh}
@@ -594,7 +571,6 @@
       .compare-card .car-name{font-size:1.1rem}
       .chat-msg.user{max-width:92%}
     }
-
     footer.site-foot{
       max-width:1100px;margin:0 auto;
       padding:24px 30px 40px;
@@ -743,7 +719,7 @@
 <footer class="site-foot">Figures are indicative for the UK market—always confirm price, spec, and running costs before you buy.</footer>
 
 <script>
-  const out = document.getElementById("out");
+const out = document.getElementById("out");
   const budget = document.getElementById("budget");
   const notes = document.getElementById("notes");
   const matchBtn = document.getElementById("matchBtn");
@@ -761,14 +737,11 @@
   const compareBtn = document.getElementById("compareBtn");
   const compareView = document.getElementById("compareView");
   const compareContent = document.getElementById("compareContent");
-
   const STORAGE_KEY = "automatch_chat";
   let compareState = null;
   const MAX_SELECTED_CARS = 14;
   const MIN_CARS_TO_COMPARE = 4;
-
   let selectedCarNames = new Set();
-
   const PICK_TO_ID = {
     Hatchback: "t_hatch", SUV: "t_suv", Saloon: "t_saloon", Estate: "t_estate",
     Coupe: "t_coupe", Electric: "t_electric", Hybrid: "t_hybrid",
@@ -778,65 +751,52 @@
     Comfort: "p_comfort", Technology: "p_tech", Performance: "p_perf",
     "Boot space": "p_space", "ULEZ friendly": "p_ulez"
   };
-
   function allChecks() {
     return Array.from(document.querySelectorAll('input[type="checkbox"]'));
   }
   const selected = () => allChecks().filter((c) => c.checked).map((c) => c.value);
-
   let activeController = null;
   let chatHistory = [];
   let chatContext = {};
-
   function getBudgetType() {
     const r = document.querySelector('input[name="budgetType"]:checked');
     return r ? r.value : "";
   }
-
   function renderText() {
     const picks = selected();
     const b = budget.value?.trim();
     const bt = getBudgetType();
     const n = notes.value?.trim();
-
     const btLabel = bt === "monthly" ? "Monthly" : bt === "full" ? "Full cost" : bt;
     out.textContent =
 `Budget: ${b || "—"}${btLabel ? ` (${btLabel})` : ""}
 Selected (${picks.length}):
 ${picks.length ? "- " + picks.join("\n- ") : "—"}
-
 Notes: ${n || "—"}`;
   }
-
   function renderLoading() {
     out.innerHTML = `<span class="loader">Matching<span class="dots"><span></span><span></span><span></span></span></span>`;
   }
-
   function showMatchError(message) {
     matchErrBox.style.display = "block";
     matchErrBox.textContent = message;
   }
-
   function showChatError(message) {
     errBoxChat.style.display = "block";
     errBoxChat.textContent = message;
   }
-
   function clearMatchError() {
     matchErrBox.style.display = "none";
     matchErrBox.textContent = "";
   }
-
   function clearChatError() {
     errBoxChat.style.display = "none";
     errBoxChat.textContent = "";
   }
-
   const HTML_ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
   function escapeHtml(s) {
     return String(s || "").replace(/[&<>"']/g, (ch) => HTML_ESC[ch]);
   }
-
   function extractCarNameOnly(raw) {
     if (!raw || typeof raw !== "string") return "";
     let s = raw.trim();
@@ -845,7 +805,6 @@ Notes: ${n || "—"}`;
     s = s.replace(/\s*[–-]\s.*$/, "").replace(/\s*:\s*.*$/, "").trim();
     return s.length > 2 && s.length < 80 ? s : "";
   }
-
   function extractCarsFromText(text) {
     const cars = new Set();
     const block = (text || "").replace(/\r\n/g, "\n");
@@ -863,7 +822,6 @@ Notes: ${n || "—"}`;
     }
     return cars;
   }
-
   function getAllMentionedCars() {
     const seen = new Set();
     const order = [];
@@ -876,9 +834,7 @@ Notes: ${n || "—"}`;
     }
     return order;
   }
-
   let prevCarList = [];
-
   function updateCarList() {
     const cars = getAllMentionedCars();
     const newNames = new Set(cars.filter(c => !prevCarList.includes(c)));
@@ -909,13 +865,11 @@ Notes: ${n || "—"}`;
     carListCountEl.textContent = `${selectedCarNames.size} selected`;
     updateCompareButton();
   }
-
   function updateCompareButton() {
     const n = selectedCarNames.size;
     compareBtn.disabled = n < MIN_CARS_TO_COMPARE;
     compareBtn.textContent = n >= MIN_CARS_TO_COMPARE ? `Compare ${n} cars` : `Compare (need ${MIN_CARS_TO_COMPARE}+)`;
   }
-
   function formatReplyToHtmlPlain(text) {
     const lines = (text || "").split("\n");
     let html = "";
@@ -973,7 +927,6 @@ Notes: ${n || "—"}`;
     closeList();
     return html || escapeHtml(text || "");
   }
-
   function appendChatMessage(role, content) {
     const wrap = document.createElement("div");
     wrap.className = `chat-msg-wrap ${role}`;
@@ -984,7 +937,6 @@ Notes: ${n || "—"}`;
     chatMessages.appendChild(wrap);
     scrollChatToBottom();
   }
-
   function showTypingIndicator() {
     const wrap = document.createElement("div");
     wrap.className = "chat-msg-wrap assistant";
@@ -996,18 +948,15 @@ Notes: ${n || "—"}`;
     chatMessages.appendChild(wrap);
     scrollChatToBottom();
   }
-
   function hideTypingIndicator() {
     const el = document.getElementById("typingIndicator");
     if (el && el.parentElement) el.parentElement.remove();
   }
-
   function scrollChatToBottom() {
     requestAnimationFrame(() => {
       chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: "smooth" });
     });
   }
-
   function updateContextBar() {
     const c = chatContext;
     const parts = [];
@@ -1020,7 +969,6 @@ Notes: ${n || "—"}`;
     chatContextBar.innerHTML = parts.length ? parts.join(" · ") : "";
     chatContextBar.style.display = parts.length ? "block" : "none";
   }
-
   function restoreFormFromContext(ctx) {
     if (!ctx) return;
     budget.value = ctx.budget || "";
@@ -1039,7 +987,6 @@ Notes: ${n || "—"}`;
     });
     renderText();
   }
-
   function switchToChatView(initialReply) {
     selectedCarNames.clear();
     chatHistory = [
@@ -1047,11 +994,9 @@ Notes: ${n || "—"}`;
       { role: "assistant", content: initialReply },
     ];
     chatContext = { budget: budget.value.trim(), budgetType: getBudgetType(), picks: selected(), notes: notes.value.trim() };
-
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ chatHistory, chatContext }));
     } catch (_) {}
-
     prefsView.classList.add("hidden");
     chatView.classList.add("active");
     restoreOverlay.classList.remove("visible");
@@ -1065,7 +1010,6 @@ Notes: ${n || "—"}`;
     updateCarList();
     requestAnimationFrame(() => { resizeChatInput(); setTimeout(resizeChatInput, 50); });
   }
-
   function goToCompare() {
     const cars = Array.from(selectedCarNames);
     if (cars.length < MIN_CARS_TO_COMPARE) return;
@@ -1073,17 +1017,14 @@ Notes: ${n || "—"}`;
     compareView.classList.add("active");
     fetchAndRenderCompare(cars);
   }
-
   function backFromCompare() {
     compareView.classList.remove("active");
     chatView.classList.add("active");
     requestAnimationFrame(() => resizeChatInput());
   }
-
   async function fetchAndRenderCompare(cars) {
     compareContent.innerHTML =
       `<div class="compare-loading"><div class="spinner"></div><p>Pulling rough UK figures for ${cars.length} cars…</p></div>`;
-
     try {
       const r = await fetch("/api/compare", {
         method: "POST",
@@ -1091,25 +1032,21 @@ Notes: ${n || "—"}`;
         body: JSON.stringify({ cars, context: chatContext }),
       });
       const data = await r.json();
-
       if (!r.ok) {
         compareContent.innerHTML = `<div class="error">${escapeHtml(data.error || "Failed to fetch comparison")}${data.details ? "<br>" + escapeHtml(String(data.details)) : ""}</div>`;
         return;
       }
-
       const carList = data.cars || [];
       if (carList.length === 0) {
         compareContent.innerHTML = `<div class="error">No comparison data returned.</div>`;
         return;
       }
-
       compareState = { cars: carList, roundNum: 1, pairIdx: 0 };
       renderCompareRound();
     } catch (e) {
       compareContent.innerHTML = `<div class="error">${escapeHtml(e?.message || "Network error")}</div>`;
     }
   }
-
   function pairUpCars(items) {
     const pairs = [];
     for (let i = 0; i < items.length; i += 2) {
@@ -1117,75 +1054,19 @@ Notes: ${n || "—"}`;
     }
     return pairs;
   }
-
-  function parseNum(s) {
-    const m = String(s || "").replace(/,/g, "").match(/[\d.]+/);
-    return m ? parseFloat(m[0]) : null;
+  function parseNum(s){const m=String(s||"").replace(/,/g,"").match(/[\d.]+/);return m?parseFloat(m[0]):null;}
+  function parseInsurance(s){const str=String(s||"");const m=str.match(/group\s*(\d+)/i)||str.match(/(\d+)/);return m?parseInt(m[1],10):parseNum(s);}
+  const RELIABILITY_ORDER=["poor","fair","average","good","excellent"];
+  function parseReliability(s){return RELIABILITY_ORDER.findIndex(r=>String(s||"").toLowerCase().includes(r));}
+  function compareStat(key,valA,valB){
+  if(!valA&&!valB)return[null,null];const a=valA,b=valB;
+  if(key==="price"){const nA=parseNum(a),nB=parseNum(b);if(nA==null||nB==null)return[null,null];return nA<nB?["better","worse"]:nA>nB?["worse","better"]:[null,null];}
+  if(key==="mpg"){const nA=parseNum(a),nB=parseNum(b);if(nA==null||nB==null)return[null,null];return nA>nB?["better","worse"]:nA<nB?["worse","better"]:[null,null];}
+  if(key==="insurance"){const nA=parseInsurance(a),nB=parseInsurance(b);if(nA==null||nB==null)return[null,null];return nA<nB?["better","worse"]:nA>nB?["worse","better"]:[null,null];}
+  if(key==="boot"){const nA=parseNum(a),nB=parseNum(b);if(nA==null||nB==null)return[null,null];return nA>nB?["better","worse"]:nA<nB?["worse","better"]:[null,null];}
+  if(key==="reliability"){const nA=parseReliability(a),nB=parseReliability(b);if(nA<0&&nB<0)return[null,null];const sA=nA>=0?nA:-1,sB=nB>=0?nB:-1;return sA>sB?["better","worse"]:sA<sB?["worse","better"]:[null,null];}
+  return[null,null];
   }
-
-  function parseInsurance(s) {
-    const str = String(s || "");
-    const m = str.match(/group\s*(\d+)/i) || str.match(/(\d+)/);
-    return m ? parseInt(m[1], 10) : parseNum(s);
-  }
-
-  const RELIABILITY_ORDER = ["poor", "fair", "average", "good", "excellent"];
-
-  function parseReliability(s) {
-    const v = String(s || "").toLowerCase();
-    return RELIABILITY_ORDER.findIndex((r) => v.includes(r));
-  }
-
-  function compareStat(key, valA, valB) {
-    if (!valA && !valB) return [null, null];
-    const a = valA;
-    const b = valB;
-
-    if (key === "price") {
-      const nA = parseNum(a);
-      const nB = parseNum(b);
-      if (nA == null || nB == null) return [null, null];
-      if (nA < nB) return ["better", "worse"];
-      if (nA > nB) return ["worse", "better"];
-      return [null, null];
-    }
-    if (key === "mpg") {
-      const nA = parseNum(a);
-      const nB = parseNum(b);
-      if (nA == null || nB == null) return [null, null];
-      if (nA > nB) return ["better", "worse"];
-      if (nA < nB) return ["worse", "better"];
-      return [null, null];
-    }
-    if (key === "insurance") {
-      const nA = parseInsurance(a);
-      const nB = parseInsurance(b);
-      if (nA == null || nB == null) return [null, null];
-      if (nA < nB) return ["better", "worse"];
-      if (nA > nB) return ["worse", "better"];
-      return [null, null];
-    }
-    if (key === "boot") {
-      const nA = parseNum(a);
-      const nB = parseNum(b);
-      if (nA == null || nB == null) return [null, null];
-      if (nA > nB) return ["better", "worse"];
-      if (nA < nB) return ["worse", "better"];
-      return [null, null];
-    }
-    if (key === "reliability") {
-      const nA = parseReliability(a);
-      const nB = parseReliability(b);
-      if (nA < 0 && nB < 0) return [null, null];
-      const sA = nA >= 0 ? nA : -1;
-      const sB = nB >= 0 ? nB : -1;
-      if (sA > sB) return ["better", "worse"];
-      if (sA < sB) return ["worse", "better"];
-      return [null, null];
-    }
-    return [null, null];
-  }
-
   function renderCarCard(car, otherCar) {
     if (!car) return "";
     const specs = [
@@ -1214,7 +1095,6 @@ Notes: ${n || "—"}`;
     html += "</div>";
     return html;
   }
-
   function renderCompareRound() {
     const { cars, roundNum, pairIdx } = compareState;
     if (cars.length === 1) {
@@ -1245,7 +1125,6 @@ Notes: ${n || "—"}`;
     }
     html += "</div>";
     compareContent.innerHTML = html;
-
     if (b) {
       compareContent.querySelectorAll(".compare-card[data-name]").forEach((el) => {
         const name = el.dataset.name;
@@ -1275,7 +1154,6 @@ Notes: ${n || "—"}`;
       setTimeout(() => renderCompareRound(), 300);
     }
   }
-
   function backToPrefs() {
     if (activeController) activeController.abort();
     activeController = null;
@@ -1291,7 +1169,6 @@ Notes: ${n || "—"}`;
     chatContextBar.innerHTML = "";
     if (hasSavedChat()) restoreOverlay.classList.add("visible");
   }
-
   function buildInitialUserPrompt() {
     const picks = selected();
     const bt = getBudgetType();
@@ -1301,7 +1178,6 @@ Notes: ${n || "—"}`;
       `Notes: ${notes.value?.trim() || "None"}`,
     ].join("\n");
   }
-
   function resetAll() {
     if (activeController) activeController.abort();
     activeController = null;
@@ -1316,7 +1192,6 @@ Notes: ${n || "—"}`;
     matchBtn.textContent = "Get recommendations";
     renderText();
   }
-
   function hasSavedChat() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1325,7 +1200,6 @@ Notes: ${n || "—"}`;
       return !!(h && h.length && c);
     } catch (_) { return false; }
   }
-
   function restoreFromStorage() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1355,11 +1229,9 @@ Notes: ${n || "—"}`;
       return true;
     } catch (_) { return false; }
   }
-
   function continueChat() {
     restoreFromStorage();
   }
-
   function startFresh() {
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
     selectedCarNames.clear();
@@ -1369,7 +1241,6 @@ Notes: ${n || "—"}`;
     allChecks().forEach(c => c.checked = false);
     renderText();
   }
-
   function initPage() {
     if (hasSavedChat()) {
       try {
@@ -1382,10 +1253,8 @@ Notes: ${n || "—"}`;
     }
     renderText();
   }
-
   async function match() {
     const picks = selected();
-
     if (picks.length < 3) {
       out.textContent = "Choose at least three options in total so we have enough to go on.";
       out.parentElement.animate(
@@ -1394,15 +1263,11 @@ Notes: ${n || "—"}`;
       );
       return;
     }
-
     if (activeController) activeController.abort();
     activeController = new AbortController();
-
     clearMatchError();
-
     matchBtn.disabled = true;
     matchBtn.textContent = "Working…";
-
     try {
       const payload = {
         budget: budget.value.trim(),
@@ -1410,59 +1275,46 @@ Notes: ${n || "—"}`;
         picks,
         notes: notes.value.trim()
       };
-
       const r = await fetch("/api/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
         signal: activeController.signal
       });
-
       const data = await r.json();
-
       matchBtn.disabled = false;
       matchBtn.textContent = "Get recommendations";
       renderText();
-
       if (!r.ok) {
         showMatchError(JSON.stringify(data, null, 2));
         return;
       }
-
       const reply = data.reply || "No reply returned.";
       switchToChatView(reply);
       chatView.scrollIntoView({ behavior: "smooth", block: "start" });
-
     } catch (e) {
       matchBtn.disabled = false;
       matchBtn.textContent = "Get recommendations";
       renderText();
-
       if (e?.name === "AbortError") return;
-
       showMatchError(e?.message || String(e));
     } finally {
       activeController = null;
     }
   }
-
   async function sendChat() {
     const text = chatInput.value.trim();
     if (!text) return;
-
     chatInput.value = "";
     resizeChatInput();
     appendChatMessage("user", text);
     chatHistory.push({ role: "user", content: text });
-
     sendBtn.disabled = true;
     sendBtn.textContent = "…";
     clearChatError();
-
     if (activeController) activeController.abort();
     activeController = new AbortController();
     showTypingIndicator();
-
     try {
       const r = await fetch("/api/match", {
         method: "POST",
@@ -1471,14 +1323,11 @@ Notes: ${n || "—"}`;
         signal: activeController.signal,
       });
       const data = await r.json();
-
       hideTypingIndicator();
-
       if (!r.ok) {
         showChatError(JSON.stringify(data, null, 2));
         return;
       }
-
       const reply = data.reply || "No reply returned.";
       chatHistory.push({ role: "assistant", content: reply });
       appendChatMessage("assistant", reply);
@@ -1493,7 +1342,6 @@ Notes: ${n || "—"}`;
       activeController = null;
     }
   }
-
   function resizeChatInput() {
     chatInput.style.height = "auto";
     const sh = chatInput.scrollHeight;
@@ -1501,22 +1349,18 @@ Notes: ${n || "—"}`;
     chatInput.style.height = h + "px";
     chatInput.style.overflowY = sh > 110 ? "auto" : "hidden";
   }
-
   chatInput.addEventListener("input", resizeChatInput);
-
   chatInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendChat();
     }
   });
-
   document.addEventListener("change", (e) => {
     if (e.target.matches('input[type="checkbox"]') || e.target.matches('input[name="budgetType"]')) renderText();
   });
   budget.addEventListener("input", renderText);
   notes.addEventListener("input", renderText);
-
   initPage();
 </script>
 
