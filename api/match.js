@@ -1,5 +1,7 @@
+// Vercel serverless — Groq chat for /api/match
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
 export default async function handler(req, res) {
-  // Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
@@ -7,7 +9,6 @@ export default async function handler(req, res) {
   try {
     const body = req.body || {};
 
-    // Ensure API key exists (set in Vercel env vars)
     if (!process.env.GROQ_API_KEY) {
       return res.status(500).json({
         error: "Missing GROQ_API_KEY",
@@ -15,11 +16,9 @@ export default async function handler(req, res) {
       });
     }
 
-    const MODEL = "llama-3.3-70b-versatile";
-
+    const model = "llama-3.3-70b-versatile";
     let messages;
 
-    // Chat continuation: messages array provided
     const chatMessages = Array.isArray(body.messages) ? body.messages : [];
     const context = body.context || {};
 
@@ -28,13 +27,13 @@ export default async function handler(req, res) {
       const budgetType = (context.budgetType ?? "").toString().trim();
       const picks = Array.isArray(context.picks) ? context.picks.map(String) : [];
       const notes = (context.notes ?? "").toString().trim();
-      const contextBlurb = [
+
+      const bits = [
         budget && `Budget: ${budget}${budgetType ? ` (${budgetType})` : ""}`,
         picks.length && `Preferences: ${picks.join(", ")}`,
         notes && `Notes: ${notes}`,
-      ]
-        .filter(Boolean)
-        .join(". ");
+      ].filter(Boolean);
+      const contextBlurb = bits.join(". ");
 
       const systemContent =
         "You are a practical UK car advisor. Be concise, specific, and not salesy. " +
@@ -44,10 +43,12 @@ export default async function handler(req, res) {
 
       messages = [
         { role: "system", content: systemContent },
-        ...chatMessages.map((m) => ({ role: m.role, content: String(m.content || "").trim() })),
+        ...chatMessages.map((m) => ({
+          role: m.role,
+          content: String(m.content || "").trim(),
+        })),
       ];
     } else {
-      // Initial request: budget, budgetType, picks, notes
       const budget = (body.budget ?? "").toString().trim();
       const budgetType = (body.budgetType ?? "").toString().trim();
       const picks = Array.isArray(body.picks) ? body.picks.map(String) : [];
@@ -75,22 +76,28 @@ export default async function handler(req, res) {
         "[Short paragraph]",
         "",
         "End with 1 short follow-up question. Keep it concise and practical.",
-      ].filter((x) => x !== false).join("\n");
+      ]
+        .filter((x) => x !== false)
+        .join("\n");
 
       messages = [
-        { role: "system", content: "You are a practical UK car advisor. Be concise, specific, and not salesy. When the user shares preferences, you always speak first with a warm opener before your recommendations." },
+        {
+          role: "system",
+          content:
+            "You are a practical UK car advisor. Be concise, specific, and not salesy. When the user shares preferences, you always speak first with a warm opener before your recommendations.",
+        },
         { role: "user", content: userPrompt },
       ];
     }
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response = await fetch(GROQ_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: MODEL,
+        model,
         temperature: 0.7,
         messages,
       }),
@@ -98,18 +105,17 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // If Groq returns an error, return it clearly (without leaking secrets)
     if (!response.ok) {
       return res.status(response.status).json({
         error: "Groq request failed",
         status: response.status,
         details: data,
-        hint: "If the error mentions a model, change MODEL to a supported one (e.g. llama-3.3-70b-versatile or llama-3.1-8b-instant).",
+        hint:
+          "If the error mentions a model, change model id to a supported one (e.g. llama-3.3-70b-versatile or llama-3.1-8b-instant).",
       });
     }
 
     const reply = data?.choices?.[0]?.message?.content;
-
     if (!reply) {
       return res.status(500).json({
         error: "No reply returned from model",
@@ -125,4 +131,3 @@ export default async function handler(req, res) {
     });
   }
 }
-

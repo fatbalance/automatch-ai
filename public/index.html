@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
 
   <style>
+    /* colours + type tokens */
     :root{
       --bg:#f2f0eb;
       --surface:#fff;
@@ -90,6 +91,7 @@
       line-height:1.65;
     }
 
+    /* prefs column + sticky summary */
     .layout{
       display:grid;
       grid-template-columns:1.35fr .65fr;
@@ -743,6 +745,7 @@
 <footer class="site-foot">Figures are indicative for the UK market—always confirm price, spec, and running costs before you buy.</footer>
 
 <script>
+  // --- refs
   const out = document.getElementById("out");
   const budget = document.getElementById("budget");
   const notes = document.getElementById("notes");
@@ -768,6 +771,8 @@
   const MIN_CARS_TO_COMPARE = 4;
 
   let selectedCarNames = new Set();
+
+  // checkbox label text -> element id (for restoring saved session)
   const PICK_TO_ID = {
     Hatchback: "t_hatch", SUV: "t_suv", Saloon: "t_saloon", Estate: "t_estate",
     Coupe: "t_coupe", Electric: "t_electric", Hybrid: "t_hybrid",
@@ -778,8 +783,10 @@
     "Boot space": "p_space", "ULEZ friendly": "p_ulez"
   };
 
-  const allChecks = () => Array.from(document.querySelectorAll('input[type="checkbox"]'));
-  const selected = () => allChecks().filter(c => c.checked).map(c => c.value);
+  function allChecks() {
+    return Array.from(document.querySelectorAll('input[type="checkbox"]'));
+  }
+  const selected = () => allChecks().filter((c) => c.checked).map((c) => c.value);
 
   let activeController = null;
   let chatHistory = [];
@@ -813,25 +820,28 @@ Notes: ${n || "—"}`;
     matchErrBox.style.display = "block";
     matchErrBox.textContent = message;
   }
+
   function showChatError(message) {
     errBoxChat.style.display = "block";
     errBoxChat.textContent = message;
   }
+
   function clearMatchError() {
     matchErrBox.style.display = "none";
     matchErrBox.textContent = "";
   }
+
   function clearChatError() {
     errBoxChat.style.display = "none";
     errBoxChat.textContent = "";
   }
 
+  const HTML_ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
   function escapeHtml(s) {
-    return String(s || "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
+    return String(s || "").replace(/[&<>"']/g, (ch) => HTML_ESC[ch]);
   }
 
+  /** pull a display name from a model line (bold or numbered) */
   function extractCarNameOnly(raw) {
     if (!raw || typeof raw !== "string") return "";
     let s = raw.trim();
@@ -874,6 +884,7 @@ Notes: ${n || "—"}`;
 
   let prevCarList = [];
 
+  // shortlist ticks — rebuilt whenever chat changes
   function updateCarList() {
     const cars = getAllMentionedCars();
     const newNames = new Set(cars.filter(c => !prevCarList.includes(c)));
@@ -911,6 +922,7 @@ Notes: ${n || "—"}`;
     compareBtn.textContent = n >= MIN_CARS_TO_COMPARE ? `Compare ${n} cars` : `Compare (need ${MIN_CARS_TO_COMPARE}+)`;
   }
 
+  // not full markdown; just the patterns we ask the model to use
   function formatReplyToHtmlPlain(text) {
     const lines = (text || "").split("\n");
     let html = "";
@@ -1076,7 +1088,8 @@ Notes: ${n || "—"}`;
   }
 
   async function fetchAndRenderCompare(cars) {
-    compareContent.innerHTML = `<div class="compare-loading"><div class="spinner"></div><p>Pulling rough UK figures for ${cars.length} cars…</p></div>`;
+    compareContent.innerHTML =
+      `<div class="compare-loading"><div class="spinner"></div><p>Pulling rough UK figures for ${cars.length} cars…</p></div>`;
 
     try {
       const r = await fetch("/api/compare", {
@@ -1112,19 +1125,72 @@ Notes: ${n || "—"}`;
     return pairs;
   }
 
-  function parseNum(s) { const m = String(s || "").replace(/,/g, "").match(/[\d.]+/); return m ? parseFloat(m[0]) : null; }
-  function parseInsurance(s) { const m = String(s || "").match(/group\s*(\d+)/i) || String(s).match(/(\d+)/); return m ? parseInt(m[1], 10) : parseNum(s); }
-  const RELIABILITY_ORDER = ["poor","fair","average","good","excellent"];
-  function parseReliability(s) { const v = String(s || "").toLowerCase(); return RELIABILITY_ORDER.findIndex(r => v.includes(r)); }
+  function parseNum(s) {
+    const m = String(s || "").replace(/,/g, "").match(/[\d.]+/);
+    return m ? parseFloat(m[0]) : null;
+  }
 
+  function parseInsurance(s) {
+    const str = String(s || "");
+    const m = str.match(/group\s*(\d+)/i) || str.match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : parseNum(s);
+  }
+
+  const RELIABILITY_ORDER = ["poor", "fair", "average", "good", "excellent"];
+
+  function parseReliability(s) {
+    const v = String(s || "").toLowerCase();
+    return RELIABILITY_ORDER.findIndex((r) => v.includes(r));
+  }
+
+  /** which side wins for green/red — "better" / "worse" / null */
   function compareStat(key, valA, valB) {
     if (!valA && !valB) return [null, null];
-    const a = valA, b = valB;
-    if (key === "price") { const nA = parseNum(a), nB = parseNum(b); if (nA == null || nB == null) return [null, null]; return nA < nB ? ["better", "worse"] : nA > nB ? ["worse", "better"] : [null, null]; }
-    if (key === "mpg") { const nA = parseNum(a), nB = parseNum(b); if (nA == null || nB == null) return [null, null]; return nA > nB ? ["better", "worse"] : nA < nB ? ["worse", "better"] : [null, null]; }
-    if (key === "insurance") { const nA = parseInsurance(a), nB = parseInsurance(b); if (nA == null || nB == null) return [null, null]; return nA < nB ? ["better", "worse"] : nA > nB ? ["worse", "better"] : [null, null]; }
-    if (key === "boot") { const nA = parseNum(a), nB = parseNum(b); if (nA == null || nB == null) return [null, null]; return nA > nB ? ["better", "worse"] : nA < nB ? ["worse", "better"] : [null, null]; }
-    if (key === "reliability") { const nA = parseReliability(a), nB = parseReliability(b); if (nA < 0 && nB < 0) return [null, null]; const sA = nA >= 0 ? nA : -1, sB = nB >= 0 ? nB : -1; return sA > sB ? ["better", "worse"] : sA < sB ? ["worse", "better"] : [null, null]; }
+    const a = valA;
+    const b = valB;
+
+    if (key === "price") {
+      const nA = parseNum(a);
+      const nB = parseNum(b);
+      if (nA == null || nB == null) return [null, null];
+      if (nA < nB) return ["better", "worse"];
+      if (nA > nB) return ["worse", "better"];
+      return [null, null];
+    }
+    if (key === "mpg") {
+      const nA = parseNum(a);
+      const nB = parseNum(b);
+      if (nA == null || nB == null) return [null, null];
+      if (nA > nB) return ["better", "worse"];
+      if (nA < nB) return ["worse", "better"];
+      return [null, null];
+    }
+    if (key === "insurance") {
+      const nA = parseInsurance(a);
+      const nB = parseInsurance(b);
+      if (nA == null || nB == null) return [null, null];
+      if (nA < nB) return ["better", "worse"];
+      if (nA > nB) return ["worse", "better"];
+      return [null, null];
+    }
+    if (key === "boot") {
+      const nA = parseNum(a);
+      const nB = parseNum(b);
+      if (nA == null || nB == null) return [null, null];
+      if (nA > nB) return ["better", "worse"];
+      if (nA < nB) return ["worse", "better"];
+      return [null, null];
+    }
+    if (key === "reliability") {
+      const nA = parseReliability(a);
+      const nB = parseReliability(b);
+      if (nA < 0 && nB < 0) return [null, null];
+      const sA = nA >= 0 ? nA : -1;
+      const sB = nB >= 0 ? nB : -1;
+      if (sA > sB) return ["better", "worse"];
+      if (sA < sB) return ["worse", "better"];
+      return [null, null];
+    }
     return [null, null];
   }
 
@@ -1157,6 +1223,7 @@ Notes: ${n || "—"}`;
     return html;
   }
 
+  // knockout rounds — compareState holds mutable bracket
   function renderCompareRound() {
     const { cars, roundNum, pairIdx } = compareState;
     if (cars.length === 1) {

@@ -1,7 +1,7 @@
 {
   "name": "automatch-ai",
   "version": "1.0.0",
-  "description": "",
+  "description": "UK car prefs UI + Groq-backed chat/compare on Vercel",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
