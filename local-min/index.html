@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoMatch Local Minimal</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:760px;margin:30px auto;padding:0 14px}
+    .box{border:1px solid #ddd;border-radius:10px;padding:12px;margin:10px 0}
+    input,textarea,button{font:inherit}
+    textarea,input{width:100%;padding:8px}
+    button{padding:8px 12px;cursor:pointer}
+    pre{white-space:pre-wrap;background:#f5f5f5;padding:10px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <h1>AutoMatch (local-min)</h1>
+  <div class="box">
+    <h3>Match</h3>
+    <input id="budget" placeholder="Budget e.g. 12000" />
+    <input id="picks" placeholder="Preferences comma separated e.g. Hatchback, Reliability" />
+    <textarea id="notes" rows="3" placeholder="Notes (optional)"></textarea>
+    <button onclick="match()">Get 3 cars</button>
+  </div>
+
+  <div class="box">
+    <h3>Compare</h3>
+    <input id="cars" placeholder="Cars comma separated e.g. Honda Civic, VW Golf" />
+    <button onclick="compareCars()">Compare cars</button>
+  </div>
+
+  <h3>Output</h3>
+  <pre id="out">Ready.</pre>
+
+  <script>
+    const out = document.getElementById("out");
+    async function match() {
+      const body = {
+        budget: document.getElementById("budget").value.trim(),
+        picks: document.getElementById("picks").value.split(",").map(x => x.trim()).filter(Boolean),
+        notes: document.getElementById("notes").value.trim()
+      };
+      out.textContent = "Loading...";
+      try {
+        const r = await fetch("/match", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const data = await r.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        out.textContent = e.message || String(e);
+      }
+    }
+    async function compareCars() {
+      const cars = document.getElementById("cars").value.split(",").map(x => x.trim()).filter(Boolean);
+      out.textContent = "Loading...";
+      try {
+        const r = await fetch("/compare", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cars }) });
+        const data = await r.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        out.textContent = e.message || String(e);
+      }
+    }
+  </script>
+</body>
+</html>
